@@ -31,6 +31,7 @@ export default async function Image() {
             fontWeight: 900,
             marginBottom: 20,
             textAlign: 'center',
+            display: 'flex',
           }}
         >
           COFFEE MUSIC & RUN
@@ -42,6 +43,7 @@ export default async function Image() {
             marginBottom: 40,
             color: '#d4d4d4',
             textAlign: 'center',
+            display: 'flex',
           }}
         >
           EDIÇÃO BRIZZ
@@ -51,6 +53,7 @@ export default async function Image() {
             fontSize: 32,
             color: '#d4d4d4',
             textAlign: 'center',
+            display: 'flex',
           }}
         >
           {EVENT_DATE} • {EVENT_TIME}
