@@ -175,6 +175,19 @@
     }
   }
   
+  .animate-scroll-gallery {
+    animation: scroll-gallery 40s linear infinite;
+  }
+  
+  @keyframes scroll-gallery {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
   .animate-scroll-infinite {
     animation: scroll-infinite 15s linear infinite;
   }

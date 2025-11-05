@@ -38,12 +38,12 @@ export function Sponsors() {
               <Image
                 src={sponsor.image}
                 alt={sponsor.alt}
-                width={sponsor.image === '/parceiro-mangalo.png' ? 220 : sponsor.image === '/parceirofrifort.png' ? 120 : 180}
-                height={sponsor.image === '/parceiro-mangalo.png' ? 140 : sponsor.image === '/parceirofrifort.png' ? 80 : 120}
-                className={`object-contain ${sponsor.image === '/parceirofrifort.png' ? 'max-w-[100px] max-h-[70px] md:max-w-[180px] md:max-h-[120px]' : ''}`}
+                width={sponsor.image === '/parceiro-mangalo.png' ? 320 : sponsor.image === '/parceirofrifort.png' ? 120 : 180}
+                height={sponsor.image === '/parceiro-mangalo.png' ? 200 : sponsor.image === '/parceirofrifort.png' ? 80 : 120}
+                className={`object-contain ${sponsor.image === '/parceirofrifort.png' ? 'max-w-[100px] max-h-[70px] md:max-w-[180px] md:max-h-[120px]' : sponsor.image === '/parceiro-mangalo.png' ? 'max-w-[220px] max-h-[140px] md:max-w-[320px] md:max-h-[200px]' : ''}`}
                 style={{ 
-                  maxWidth: sponsor.image === '/parceiro-mangalo.png' ? '220px' : sponsor.image === '/parceirofrifort.png' ? undefined : '100%', 
-                  maxHeight: sponsor.image === '/parceiro-mangalo.png' ? '140px' : sponsor.image === '/parceirofrifort.png' ? undefined : '100%',
+                  maxWidth: sponsor.image === '/parceiro-mangalo.png' ? undefined : sponsor.image === '/parceirofrifort.png' ? undefined : '100%', 
+                  maxHeight: sponsor.image === '/parceiro-mangalo.png' ? undefined : sponsor.image === '/parceirofrifort.png' ? undefined : '100%',
                   width: 'auto',
                   height: 'auto',
                   filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' 

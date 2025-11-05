@@ -34,12 +34,12 @@ export function SponsorsCarousel() {
                 <Image
                   src={sponsor.image}
                   alt={sponsor.alt}
-                  width={sponsor.image === '/parceirofrifort.png' ? 100 : sponsor.image === '/parceiro-mangalo.png' ? 220 : 180}
-                  height={sponsor.image === '/parceirofrifort.png' ? 70 : sponsor.image === '/parceiro-mangalo.png' ? 140 : 120}
-                  className="object-contain"
+                  width={sponsor.image === '/parceirofrifort.png' ? 100 : sponsor.image === '/parceiro-mangalo.png' ? 320 : 180}
+                  height={sponsor.image === '/parceirofrifort.png' ? 70 : sponsor.image === '/parceiro-mangalo.png' ? 200 : 120}
+                  className={`object-contain ${sponsor.image === '/parceiro-mangalo.png' ? 'max-w-[220px] max-h-[140px] md:max-w-[320px] md:max-h-[200px]' : ''}`}
                   style={{ 
-                    maxWidth: sponsor.image === '/parceirofrifort.png' ? '100px' : sponsor.image === '/parceiro-mangalo.png' ? '220px' : '180px', 
-                    maxHeight: sponsor.image === '/parceirofrifort.png' ? '70px' : sponsor.image === '/parceiro-mangalo.png' ? '140px' : '120px',
+                    maxWidth: sponsor.image === '/parceirofrifort.png' ? '100px' : sponsor.image === '/parceiro-mangalo.png' ? undefined : '180px', 
+                    maxHeight: sponsor.image === '/parceirofrifort.png' ? '70px' : sponsor.image === '/parceiro-mangalo.png' ? undefined : '120px',
                     width: 'auto',
                     height: 'auto',
                     objectFit: 'contain'
@@ -62,12 +62,12 @@ export function SponsorsCarousel() {
                 <Image
                   src={sponsor.image}
                   alt={sponsor.alt}
-                  width={sponsor.image === '/parceirofrifort.png' ? 100 : sponsor.image === '/parceiro-mangalo.png' ? 220 : 180}
-                  height={sponsor.image === '/parceirofrifort.png' ? 70 : sponsor.image === '/parceiro-mangalo.png' ? 140 : 120}
-                  className="object-contain"
+                  width={sponsor.image === '/parceirofrifort.png' ? 100 : sponsor.image === '/parceiro-mangalo.png' ? 320 : 180}
+                  height={sponsor.image === '/parceirofrifort.png' ? 70 : sponsor.image === '/parceiro-mangalo.png' ? 200 : 120}
+                  className={`object-contain ${sponsor.image === '/parceiro-mangalo.png' ? 'max-w-[220px] max-h-[140px] md:max-w-[320px] md:max-h-[200px]' : ''}`}
                   style={{ 
-                    maxWidth: sponsor.image === '/parceirofrifort.png' ? '100px' : sponsor.image === '/parceiro-mangalo.png' ? '220px' : '180px', 
-                    maxHeight: sponsor.image === '/parceirofrifort.png' ? '70px' : sponsor.image === '/parceiro-mangalo.png' ? '140px' : '120px',
+                    maxWidth: sponsor.image === '/parceirofrifort.png' ? '100px' : sponsor.image === '/parceiro-mangalo.png' ? undefined : '180px', 
+                    maxHeight: sponsor.image === '/parceirofrifort.png' ? '70px' : sponsor.image === '/parceiro-mangalo.png' ? undefined : '120px',
                     width: 'auto',
                     height: 'auto',
                     objectFit: 'contain'

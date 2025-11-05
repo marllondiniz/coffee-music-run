@@ -94,36 +94,6 @@ export function Hero() {
       
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-6 md:px-6 lg:px-8 py-4 md:py-20 lg:py-24">
         <div className="flex flex-col md:grid md:grid-cols-2 gap-4 sm:gap-6 md:gap-12 lg:gap-16 xl:gap-20 items-center mb-6 md:mb-16 lg:mb-20">
-          {/* Counter - Apenas Mobile, acima da imagem */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.05 }}
-            className="w-full lg:hidden mb-4"
-          >
-            <div className="flex items-center justify-center gap-3">
-              <div className="flex items-center gap-2">
-                {[
-                  { label: 'D', value: timeLeft.days },
-                  { label: 'H', value: timeLeft.hours },
-                  { label: 'M', value: timeLeft.minutes },
-                  { label: 'S', value: timeLeft.seconds },
-                ].map((item, index) => (
-                  <div key={item.label} className="flex flex-col items-center">
-                    <div className="bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 min-w-[45px] text-center shadow-lg">
-                      <div className="text-lg font-orbitron font-bold text-neutral-100">
-                        {String(item.value).padStart(2, '0')}
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-neutral-400 mt-1 font-space uppercase tracking-wider">
-                      {item.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
           {/* Imagem do evento - primeiro no mobile */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}

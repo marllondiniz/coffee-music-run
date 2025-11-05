@@ -33,11 +33,11 @@ export function Location() {
             className="bg-neutral-900/80 backdrop-blur-sm border border-white/10 rounded-2xl p-6 md:p-8 hover:border-white/20 transition-all duration-300 shadow-xl space-y-6"
           >
             {/* Informações do local */}
-            <div className="text-center space-y-2 md:space-y-3">
-              <div className="flex items-center justify-center">
+            <div className="text-center space-y-1 md:space-y-2">
+              <div className="flex items-center justify-center mb-2 md:mb-3">
                 <div className="relative h-24 w-24 md:h-32 md:w-32 lg:h-40 lg:w-40 flex-shrink-0">
                   <Image
-                    src="/logo-brizz.webp"
+                    src="/logo-briss.webp"
                     alt="Brizz"
                     width={160}
                     height={160}

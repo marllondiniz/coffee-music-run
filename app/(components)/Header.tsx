@@ -44,8 +44,8 @@ export function Header() {
         {/* Mobile: Logo e Botão */}
         {/* Desktop: Logo, Counter e Botão na mesma linha */}
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-4">
-          {/* Mobile: Logo e Botão lado a lado */}
-          <div className="flex items-center justify-between w-full lg:hidden gap-4">
+          {/* Mobile: Logo e Botão em coluna */}
+          <div className="flex flex-col items-center justify-center w-full lg:hidden gap-3">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -74,6 +74,32 @@ export function Header() {
                 />
               </div>
             </motion.div>
+
+            {/* Counter Mobile */}
+            <div className="flex items-center justify-center gap-2 sm:gap-3 w-full">
+              <div className="text-xs sm:text-sm font-space text-neutral-300">
+                Faltam:
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3">
+                {[
+                  { label: 'D', value: timeLeft.days },
+                  { label: 'H', value: timeLeft.hours },
+                  { label: 'M', value: timeLeft.minutes },
+                  { label: 'S', value: timeLeft.seconds },
+                ].map((item) => (
+                  <div key={item.label} className="flex flex-col items-center">
+                    <div className="bg-neutral-900 border-2 border-white/20 rounded-xl px-4 py-3 min-w-[60px] sm:min-w-[70px] text-center shadow-xl">
+                      <div className="text-3xl sm:text-4xl font-orbitron font-bold text-white pulse-glow">
+                        {String(item.value).padStart(2, '0')}
+                      </div>
+                    </div>
+                    <div className="text-xs sm:text-sm text-neutral-300 mt-1.5 font-space uppercase tracking-wider font-bold">
+                      {item.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* CTA Mobile */}
             <motion.a
