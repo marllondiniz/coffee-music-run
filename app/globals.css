@@ -118,32 +118,32 @@
   .radial-gradient-1 {
     background: radial-gradient(circle at 20% 30%, rgba(237, 237, 237, 0.08) 0%, transparent 50%);
     animation: radial-pulse-1 8s ease-in-out infinite;
+    transform-origin: center;
+    will-change: opacity;
   }
   
   .radial-gradient-2 {
     background: radial-gradient(circle at 80% 70%, rgba(237, 237, 237, 0.06) 0%, transparent 50%);
     animation: radial-pulse-2 10s ease-in-out infinite;
+    transform-origin: center;
+    will-change: opacity;
   }
   
   @keyframes radial-pulse-1 {
     0%, 100% {
       opacity: 0.5;
-      transform: scale(1);
     }
     50% {
       opacity: 1;
-      transform: scale(1.1);
     }
   }
   
   @keyframes radial-pulse-2 {
     0%, 100% {
       opacity: 0.5;
-      transform: scale(1);
     }
     50% {
       opacity: 1;
-      transform: scale(1.15);
     }
   }
   
@@ -154,6 +154,8 @@
     background: rgba(237, 237, 237, 0.5);
     border-radius: 50%;
     animation: float 15s infinite ease-in-out;
+    will-change: transform, opacity;
+    contain: layout style paint;
   }
   
   @keyframes float {
@@ -168,7 +170,7 @@
       opacity: 1;
     }
     50% {
-      transform: translateY(-100vh) translateX(100px);
+      transform: translateY(-80vh) translateX(50px);
       opacity: 0;
     }
   }

@@ -37,7 +37,7 @@ export function Tickets() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative w-full aspect-video md:aspect-square rounded-2xl overflow-hidden border border-white/10 shadow-xl group"
+                className="relative w-full aspect-[3/4] md:aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-xl group"
               >
                 <Image
                   src="/garmim-sorteio.jpg"
@@ -56,9 +56,9 @@ export function Tickets() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="space-y-4 md:space-y-6"
+                className="space-y-4 md:space-y-6 text-center md:text-left"
               >
-                <div>
+                <div className="flex justify-center md:justify-start">
                   <span className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-xs md:text-sm font-orbitron font-bold text-white uppercase tracking-wider mb-4">
                     🎁 EXCLUSIVO PARA OS 200 PRIMEIROS
                   </span>
@@ -96,14 +96,14 @@ export function Tickets() {
             {/* Efeito de brilho sutil */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             
-            <div className="relative z-10 flex flex-col h-full">
+            <div className="relative z-10 flex flex-col h-full text-center md:text-left">
               <h3 className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100 mb-6">
                 Experiência Coffee Music
               </h3>
               
               {/* Preço destacado */}
               <div className="mb-8 pb-8 border-b border-white/10">
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 justify-center md:justify-start">
                   <span className="text-2xl md:text-3xl font-space text-neutral-400">R$</span>
                   <span className="text-5xl md:text-6xl font-orbitron font-black text-neutral-100">60</span>
                   <span className="text-xl md:text-2xl font-space text-neutral-400">,00</span>
@@ -114,7 +114,7 @@ export function Tickets() {
                 Inclui:
               </p>
               
-              <ul className="space-y-3 md:space-y-4 mb-8 flex-grow">
+              <ul className="space-y-3 md:space-y-4 mb-8 flex-grow text-left md:text-left">
                 {EXPERIENCIA_ITEMS.slice(0, 6).map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <span className="text-neutral-100 mt-1 text-base flex-shrink-0">✓</span>
@@ -155,14 +155,14 @@ export function Tickets() {
               Popular
             </div>
             
-            <div className="relative z-10 flex flex-col h-full">
-              <h3 className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100 mb-6 pr-16">
+            <div className="relative z-10 flex flex-col h-full text-center md:text-left">
+              <h3 className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100 mb-6 md:pr-16">
                 Experiência COFFEEMUSIC + Camisa
               </h3>
               
               {/* Preço destacado */}
               <div className="mb-8 pb-8 border-b border-white/20">
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 justify-center md:justify-start">
                   <span className="text-2xl md:text-3xl font-space text-neutral-400">R$</span>
                   <span className="text-5xl md:text-6xl font-orbitron font-black text-neutral-100">100</span>
                   <span className="text-xl md:text-2xl font-space text-neutral-400">,00</span>
@@ -173,7 +173,7 @@ export function Tickets() {
                 Inclui todos os benefícios da Experiência Coffee Music, mais:
               </p>
               
-              <ul className="space-y-3 md:space-y-4 mb-8 flex-grow">
+              <ul className="space-y-3 md:space-y-4 mb-8 flex-grow text-left md:text-left">
                 {EXPERIENCIA_PLUS_ITEMS.map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <span className="text-neutral-100 mt-1 text-base flex-shrink-0">⚡</span>

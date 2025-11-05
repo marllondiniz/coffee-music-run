@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { EVENT_NAME, EVENT_LOCATION_NAME } from '@/lib/constants'
 
 export function Footer() {
@@ -19,15 +20,32 @@ export function Footer() {
             <div className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100">
               COFFEE MUSIC
             </div>
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-neutral-100 flex items-center justify-center">
-              <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-neutral-100" />
+            <div className="relative h-10 w-10 md:h-12 md:w-12 rounded-full overflow-hidden flex-shrink-0">
+              <Image
+                src="/logo-coffe-music.jpg"
+                alt="Coffee Music & Run"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 40px, 48px"
+              />
             </div>
           </div>
 
           {/* Brizz Logo */}
           <div className="text-center md:text-left">
-            <div className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100 mb-2">
-              BRIZZ
+            <div className="flex items-center gap-4 justify-center md:justify-start mb-2">
+              <div className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100">
+                BRIZZ
+              </div>
+              <div className="relative h-10 w-10 md:h-12 md:w-12 rounded-full overflow-hidden flex-shrink-0">
+                <Image
+                  src="/logo%20brizz.jpg"
+                  alt="Brizz"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 40px, 48px"
+                />
+              </div>
             </div>
             <div className="text-xs md:text-sm text-neutral-300 font-space uppercase tracking-wider">
               CULTURA & GASTRONOMIA

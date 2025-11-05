@@ -1,64 +1,129 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Image from 'next/image'
-import { EVENT_NAME, TICKETS_URL } from '@/lib/constants'
+import { EVENT_DATE_ISO } from '@/lib/constants'
 import { SponsorsCarousel } from './SponsorsCarousel'
 
 export function Hero() {
   const [eventoImageError, setEventoImageError] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  })
   
-  const particles = useMemo(() => 
-    Array.from({ length: 20 }).map((_, i) => ({
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date().getTime()
+      const distance = EVENT_DATE_ISO - now
+
+      if (distance > 0) {
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        })
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+      }
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+  
+  const particles = useMemo(() => {
+    if (!mounted) return []
+    return Array.from({ length: 20 }).map((_, i) => ({
       id: i,
       left: Math.random() * 100,
       bottom: Math.random() * 100,
       delay: Math.random() * 15,
       duration: 10 + Math.random() * 10,
-    })), []
-  )
+    }))
+  }, [mounted])
 
   return (
-    <section id="hero" className="relative flex items-center justify-center overflow-hidden py-8 md:min-h-screen md:py-0">
-      {/* Background effects */}
-      <div className="absolute inset-0 z-0 animated-grid opacity-20" />
-      <div className="absolute inset-0 z-0 radial-gradient-1" />
-      <div className="absolute inset-0 z-0 radial-gradient-2" />
-      
-      {particles.map((particle) => (
-        <div
-          key={particle.id}
-          className="particle"
+    <section id="hero" className="relative flex items-center justify-center overflow-hidden py-6 md:min-h-screen md:py-0">
+      {/* Background effects container with overflow hidden */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 animated-grid opacity-20" />
+        <div className="absolute inset-0 radial-gradient-1" />
+        <div className="absolute inset-0 radial-gradient-2" />
+        
+        {particles.map((particle) => (
+          <div
+            key={particle.id}
+            className="particle"
+            style={{
+              left: `${particle.left}%`,
+              bottom: `${particle.bottom}%`,
+              animationDelay: `${particle.delay}s`,
+              animationDuration: `${particle.duration}s`,
+            }}
+          />
+        ))}
+        
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: 'reverse',
+          }}
           style={{
-            left: `${particle.left}%`,
-            bottom: `${particle.bottom}%`,
-            animationDelay: `${particle.delay}s`,
-            animationDuration: `${particle.duration}s`,
+            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(212, 212, 212, 0.08) 0%, transparent 50%),
+                             radial-gradient(circle at 80% 80%, rgba(212, 212, 212, 0.06) 0%, transparent 50%)`,
+            backgroundSize: '200% 200%',
+            filter: 'blur(60px)',
+            willChange: 'background-position',
           }}
         />
-      ))}
+      </div>
       
-      <motion.div
-        className="absolute inset-0 z-0"
-        animate={{
-          backgroundPosition: ['0% 0%', '100% 100%'],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          repeatType: 'reverse',
-        }}
-        style={{
-          backgroundImage: `radial-gradient(circle at 20% 50%, rgba(212, 212, 212, 0.08) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 80%, rgba(212, 212, 212, 0.06) 0%, transparent 50%)`,
-          backgroundSize: '200% 200%',
-          filter: 'blur(60px)',
-        }}
-      />
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 md:px-6 lg:px-8 py-0 md:py-20 lg:py-24">
-        <div className="flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-12 lg:gap-16 xl:gap-20 items-center mb-8 md:mb-16 lg:mb-20">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-6 md:px-6 lg:px-8 py-4 md:py-20 lg:py-24">
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-4 sm:gap-6 md:gap-12 lg:gap-16 xl:gap-20 items-center mb-6 md:mb-16 lg:mb-20">
+          {/* Counter - Apenas Mobile, acima da imagem */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.05 }}
+            className="w-full lg:hidden mb-4"
+          >
+            <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center gap-2">
+                {[
+                  { label: 'D', value: timeLeft.days },
+                  { label: 'H', value: timeLeft.hours },
+                  { label: 'M', value: timeLeft.minutes },
+                  { label: 'S', value: timeLeft.seconds },
+                ].map((item, index) => (
+                  <div key={item.label} className="flex flex-col items-center">
+                    <div className="bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 min-w-[45px] text-center shadow-lg">
+                      <div className="text-lg font-orbitron font-bold text-neutral-100">
+                        {String(item.value).padStart(2, '0')}
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-neutral-400 mt-1 font-space uppercase tracking-wider">
+                      {item.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
           {/* Imagem do evento - primeiro no mobile */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -71,7 +136,7 @@ export function Hero() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative w-full h-[180px] sm:h-[220px] md:h-auto md:aspect-[16/9] lg:min-h-[600px] xl:min-h-[700px] rounded-lg md:rounded-2xl overflow-hidden shadow-xl group mx-auto"
+                className="relative w-full h-[140px] sm:h-[180px] md:h-auto md:aspect-[16/9] lg:min-h-[600px] xl:min-h-[700px] rounded-xl md:rounded-2xl overflow-hidden shadow-xl group mx-auto"
               >
                 <Image
                   src="/evento.jpg"
@@ -88,12 +153,12 @@ export function Hero() {
           </motion.div>
 
           {/* Conteúdo de texto - segundo no mobile */}
-          <div className="text-center md:text-left w-full md:order-1">
+          <div className="text-center md:text-left w-full md:order-1 space-y-4 sm:space-y-5 md:space-y-6 min-w-0">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-orbitron font-black mb-4 md:mb-8 lg:mb-10 tracking-tight leading-tight"
+              className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-orbitron font-black tracking-tight leading-tight break-words"
             >
               <span className="text-gradient pulse-glow inline-block">
                 COFFEE MUSIC & RUN
@@ -104,8 +169,16 @@ export function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-neutral-300 mb-4 sm:mb-6 md:mb-12 lg:mb-16 leading-relaxed font-space"
-              style={{ wordBreak: 'normal', overflowWrap: 'break-word', hyphens: 'none' }}
+              className="text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl text-neutral-300 leading-relaxed font-space w-full"
+              style={{ 
+                wordBreak: 'normal', 
+                overflowWrap: 'normal', 
+                hyphens: 'none',
+                whiteSpace: 'normal',
+                lineHeight: '1.7',
+                wordSpacing: 'normal',
+                maxWidth: '100%'
+              }}
             >
               Vem aí uma edição pra fechar o ano no <span className="text-shimmer">ritmo certo</span>, com nova energia, novo cenário e a mesma vibe que fez o Coffee Music se tornar o que é: uma <span className="text-neutral-100 font-semibold">comunidade que corre, vive e celebra junto</span>.
             </motion.p>
@@ -114,8 +187,16 @@ export function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-neutral-100 font-orbitron font-bold mb-6 sm:mb-8 md:mb-10 lg:mb-12 leading-tight sm:leading-normal"
-              style={{ wordBreak: 'normal', overflowWrap: 'break-word', hyphens: 'none' }}
+              className="text-sm sm:text-base md:text-xl lg:text-2xl xl:text-3xl text-neutral-100 font-orbitron font-bold leading-tight sm:leading-normal w-full"
+              style={{ 
+                wordBreak: 'normal', 
+                overflowWrap: 'normal', 
+                hyphens: 'none',
+                whiteSpace: 'normal',
+                lineHeight: '1.6',
+                wordSpacing: 'normal',
+                maxWidth: '100%'
+              }}
             >
               O Brizz será palco dessa nova largada. Pode apostar: vai ser histórico.
             </motion.p>
@@ -125,15 +206,27 @@ export function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="flex items-center md:items-start justify-center md:justify-start"
+              className="flex items-center md:items-start justify-center md:justify-start pt-2"
             >
               <motion.a
-                href={TICKETS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#ingressos"
+                onClick={(e) => {
+                  e.preventDefault()
+                  const element = document.getElementById('ingressos')
+                  if (element) {
+                    const headerOffset = 100
+                    const elementPosition = element.getBoundingClientRect().top
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+                    window.scrollTo({
+                      top: offsetPosition,
+                      behavior: 'smooth'
+                    })
+                  }
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 sm:px-8 md:px-12 lg:px-16 py-3 sm:py-4 md:py-5 lg:py-6 bg-white text-neutral-950 font-orbitron font-bold text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-wider border-2 border-white transition-all duration-300 hover:bg-transparent hover:text-white rounded-xl md:rounded-2xl"
+                className="px-6 sm:px-8 md:px-12 lg:px-16 py-3 sm:py-4 md:py-5 lg:py-6 bg-white text-neutral-950 font-orbitron font-bold text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-wider border-2 border-white transition-all duration-300 hover:bg-transparent hover:text-white rounded-xl md:rounded-2xl cursor-pointer"
               >
                 ⚡️ Garantir ingresso
               </motion.a>
@@ -141,17 +234,21 @@ export function Hero() {
           </div>
         </div>
         
-        {/* Carrossel de Patrocinadores */}
+        {/* Carrossel de Patrocinadores - Full Width */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-8 md:mt-16 lg:mt-20"
+          className="relative z-10 w-full mt-6 md:mt-8 lg:mt-12"
         >
-          <h3 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-orbitron font-bold text-neutral-300 text-center mb-4 md:mb-8 lg:mb-10 uppercase tracking-wider">
-            Patrocinadores & Parcerias
-          </h3>
-          <SponsorsCarousel />
+          <div className="mb-4 md:mb-6 lg:mb-8">
+            <h3 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-orbitron font-bold text-neutral-300 text-center uppercase tracking-wider">
+              Patrocinadores & Parcerias
+            </h3>
+          </div>
+          <div className="w-screen relative left-1/2 -translate-x-1/2">
+            <SponsorsCarousel />
+          </div>
         </motion.div>
       </div>
     </section>
