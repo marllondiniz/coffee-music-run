@@ -16,7 +16,7 @@ export function About() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="space-y-6 md:space-y-8"
+          className="space-y-2 md:space-y-8"
         >
           {/* Título - Mobile: Centralizado, Desktop: Dentro da coluna de texto */}
           <motion.h2
@@ -24,7 +24,7 @@ export function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-orbitron font-bold text-neutral-100 mb-8 text-center md:hidden"
+            className="text-3xl md:text-4xl lg:text-5xl font-orbitron font-bold text-neutral-100 md:hidden text-center"
           >
             Sobre o Projeto
           </motion.h2>
@@ -36,7 +36,7 @@ export function About() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.25 }}
-              className="mb-6 md:mb-8 flex justify-center"
+              className="md:mb-8 flex justify-center"
             >
               <div className="relative h-16 md:h-20 w-auto">
                 <Image
