@@ -36,14 +36,13 @@ export const EXPERIENCIA_PLUS_ITEMS = [
 ]
 
 export const SCHEDULE = [
-  { time: '6h30', title: 'Check-in e Concentração', description: 'Pegue seu kit, aqueça e prepare a energia!', icon: '📍' },
-  { time: '7h00', title: 'Corrida 5km / 7km', description: 'Largada! Corre no seu ritmo e aproveita cada metro', icon: '🏃' },
-  { time: '8h00', title: 'Treino Funcional', description: 'Movimento em grupo, suor e muita energia', icon: '💪' },
-  { time: '8h30', title: 'Café Especial', description: 'O momento de recarregar com café, matchá e shot imunidade', icon: '☕' },
-  { time: '9h00', title: 'Sessão de Yoga', description: 'Relaxa, respira e conecta corpo e mente', icon: '🧘' },
-  { time: '9h30', title: 'DJ e Música', description: 'A vibe aumenta! DJ no comando e a energia no máximo', icon: '🎵' },
-  { time: '9h45', title: 'Massagem', description: 'Relaxa e recupera com massagem relaxante', icon: '💆' },
-  { time: '10h00', title: 'Sorteios', description: 'Hora de sortear prêmios e brindes exclusivos!', icon: '🎁' },
+  { time: '6h', title: 'Coffee Party Mangalô', description: 'Início do evento com café e música', icon: '☕' },
+  { time: '6h50', title: 'Warm Up Filho do Leão J3', description: 'Aquecimento e preparação para a corrida', icon: '🔥' },
+  { time: '7h', title: 'Coffee, Music and Run', description: 'Corrida com música e café no percurso', icon: '🏃' },
+  { time: '7h45', title: 'Slow Down and Yoga', description: 'Relaxa, respira e conecta corpo e mente', icon: '🧘' },
+  { time: '8h', title: 'Games, Fruits, Shots and Juices', description: 'Momentos de diversão, frutas, shots e sucos', icon: '🍎' },
+  { time: '8h45', title: 'Sorteios e premiações', description: 'Hora de sortear prêmios e brindes exclusivos!', icon: '🎁' },
+  { time: '9h - 12h', title: 'Healthy Party Brizz', description: 'Festa saudável com música, dança e muita energia', icon: '🎵' },
 ]
 
 export const FAQ_ITEMS = [

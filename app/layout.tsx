@@ -61,6 +61,21 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="scroll-smooth">
       <head>
+        <meta property="og:title" content="Coffee Music & Run — Edição BRIZZ" />
+        <meta property="og:description" content="Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade. Edição BRIZZ — 13 de dezembro, 6h30." />
+        <meta property="og:image" content="https://ritmocertoclub.com.br/brizz.webp" />
+        <meta property="og:image:width" content="1380" />
+        <meta property="og:image:height" content="1706" />
+        <meta property="og:image:type" content="image/webp" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ritmocertoclub.com.br" />
+        <meta property="og:site_name" content="Coffee Music & Run" />
+        <meta property="og:locale" content="pt_BR" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Coffee Music & Run — Edição BRIZZ" />
+        <meta name="twitter:description" content="Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade." />
+        <meta name="twitter:image" content="https://ritmocertoclub.com.br/brizz.webp" />
+        <meta name="twitter:image:alt" content="Coffee Music & Run — Edição BRIZZ" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />

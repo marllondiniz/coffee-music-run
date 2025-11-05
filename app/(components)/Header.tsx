@@ -41,10 +41,10 @@ export function Header() {
       className="sticky top-0 z-50 bg-neutral-950/95 backdrop-blur-sm border-b border-white/10"
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
-        {/* Mobile: Logo e Botão lado a lado, Counter abaixo */}
+        {/* Mobile: Logo e Botão */}
         {/* Desktop: Logo, Counter e Botão na mesma linha */}
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-4">
-          {/* Mobile: Linha superior com Logo e Botão lado a lado */}
+          {/* Mobile: Logo e Botão lado a lado */}
           <div className="flex items-center justify-between w-full lg:hidden gap-4">
             {/* Logo */}
             <motion.div
@@ -61,14 +61,17 @@ export function Header() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div className="relative h-14 w-14 md:h-12 md:w-12 lg:h-14 lg:w-14 rounded-full overflow-hidden">
+              <div className="relative h-6 sm:h-7">
                 <Image
-                  src="/logo-coffe-music.jpg"
+                  src="/coffe-music.png"
                   alt="Coffee Music & Run"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 56px, (max-width: 1024px) 48px, 56px"
+                  width={150}
+                  height={75}
+                  className="object-contain h-full w-auto"
+                  style={{ imageRendering: 'high-quality' }}
+                  sizes="(max-width: 640px) 60px, 70px"
                   priority
+                  unoptimized
                 />
               </div>
             </motion.div>
@@ -101,14 +104,17 @@ export function Header() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <div className="relative h-10 w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 rounded-full overflow-hidden">
+            <div className="relative h-7 md:h-8">
               <Image
-                src="/logo-coffe-music.jpg"
+                src="/coffe-music.png"
                 alt="Coffee Music & Run"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 40px, (max-width: 1024px) 48px, 56px"
+                width={150}
+                height={75}
+                className="object-contain h-full w-auto"
+                style={{ imageRendering: 'high-quality' }}
+                sizes="(max-width: 1024px) 65px, 75px"
                 priority
+                unoptimized
               />
             </div>
           </motion.div>

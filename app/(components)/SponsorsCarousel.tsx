@@ -1,9 +1,14 @@
 'use client'
 
-const SPONSORS = Array.from({ length: 6 }).map((_, i) => ({
-  id: i,
-  name: `Patrocinador ${i + 1}`,
-}))
+import Image from 'next/image'
+
+const SPONSORS = [
+  { id: 1, image: '/parceiro-tutti.png', alt: 'Tuti Frutti' },
+  { id: 2, image: '/parceiro_Fidelity.png', alt: 'Fidelity' },
+  { id: 3, image: '/parceiro-live.png', alt: 'Live' },
+  { id: 4, image: '/parceiro-mangalo.png', alt: 'Mangalô' },
+  { id: 5, image: '/parceirofrifort.png', alt: 'Frifort' },
+]
 
 export function SponsorsCarousel() {
   // Duplicar os patrocinadores para criar efeito infinito
@@ -21,11 +26,25 @@ export function SponsorsCarousel() {
           {duplicatedSponsors.map((sponsor, index) => (
             <div
               key={`first-${sponsor.id}-${index}`}
-              className="flex-shrink-0 px-4 sm:px-6 md:px-8 lg:px-10 py-4 md:py-5 lg:py-6 bg-neutral-900/80 backdrop-blur-sm border border-white/10 rounded-xl hover:border-white/20 transition-all duration-300 shadow-lg min-w-[180px] sm:min-w-[200px] md:min-w-[250px] lg:min-w-[280px] flex items-center justify-center"
+              className="flex-shrink-0 bg-transparent border border-white/10 rounded-xl hover:border-white/20 transition-all duration-300 flex items-center justify-center"
+              style={{ width: '160px', height: '120px' }}
             >
-              <span className="text-neutral-300 font-space text-xs sm:text-sm md:text-base lg:text-lg whitespace-nowrap">
-                {sponsor.name}
-              </span>
+              <div className="relative w-full h-full flex items-center justify-center">
+                <Image
+                  src={sponsor.image}
+                  alt={sponsor.alt}
+                  width={sponsor.image === '/parceirofrifort.png' ? 100 : sponsor.image === '/parceiro-mangalo.png' ? 220 : 180}
+                  height={sponsor.image === '/parceirofrifort.png' ? 70 : sponsor.image === '/parceiro-mangalo.png' ? 140 : 120}
+                  className="object-contain"
+                  style={{ 
+                    maxWidth: sponsor.image === '/parceirofrifort.png' ? '100px' : sponsor.image === '/parceiro-mangalo.png' ? '220px' : '180px', 
+                    maxHeight: sponsor.image === '/parceirofrifort.png' ? '70px' : sponsor.image === '/parceiro-mangalo.png' ? '140px' : '120px',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -35,11 +54,25 @@ export function SponsorsCarousel() {
           {duplicatedSponsors.map((sponsor, index) => (
             <div
               key={`second-${sponsor.id}-${index}`}
-              className="flex-shrink-0 px-4 sm:px-6 md:px-8 lg:px-10 py-4 md:py-5 lg:py-6 bg-neutral-900/80 backdrop-blur-sm border border-white/10 rounded-xl hover:border-white/20 transition-all duration-300 shadow-lg min-w-[180px] sm:min-w-[200px] md:min-w-[250px] lg:min-w-[280px] flex items-center justify-center"
+              className="flex-shrink-0 bg-transparent border border-white/10 rounded-xl hover:border-white/20 transition-all duration-300 flex items-center justify-center"
+              style={{ width: '160px', height: '120px' }}
             >
-              <span className="text-neutral-300 font-space text-xs sm:text-sm md:text-base lg:text-lg whitespace-nowrap">
-                {sponsor.name}
-              </span>
+              <div className="relative w-full h-full flex items-center justify-center">
+                <Image
+                  src={sponsor.image}
+                  alt={sponsor.alt}
+                  width={sponsor.image === '/parceirofrifort.png' ? 100 : sponsor.image === '/parceiro-mangalo.png' ? 220 : 180}
+                  height={sponsor.image === '/parceirofrifort.png' ? 70 : sponsor.image === '/parceiro-mangalo.png' ? 140 : 120}
+                  className="object-contain"
+                  style={{ 
+                    maxWidth: sponsor.image === '/parceirofrifort.png' ? '100px' : sponsor.image === '/parceiro-mangalo.png' ? '220px' : '180px', 
+                    maxHeight: sponsor.image === '/parceirofrifort.png' ? '70px' : sponsor.image === '/parceiro-mangalo.png' ? '140px' : '120px',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>

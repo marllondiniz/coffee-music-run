@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { EVENT_LOCATION_NAME, EVENT_ADDRESS, EVENT_MAP_URL, EVENT_ADDRESS_FOR_MAP } from '@/lib/constants'
+import { EVENT_ADDRESS, EVENT_MAP_URL, EVENT_ADDRESS_FOR_MAP } from '@/lib/constants'
 
 export function Location() {
   return (
@@ -33,18 +33,16 @@ export function Location() {
             className="bg-neutral-900/80 backdrop-blur-sm border border-white/10 rounded-2xl p-6 md:p-8 hover:border-white/20 transition-all duration-300 shadow-xl space-y-6"
           >
             {/* Informações do local */}
-            <div className="text-center space-y-4 md:space-y-6">
-              <div className="flex items-center justify-center gap-4">
-                <div className="text-2xl md:text-3xl lg:text-4xl font-orbitron font-bold text-neutral-100">
-                  {EVENT_LOCATION_NAME}
-                </div>
-                <div className="relative h-10 w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 rounded-full overflow-hidden flex-shrink-0">
+            <div className="text-center space-y-2 md:space-y-3">
+              <div className="flex items-center justify-center">
+                <div className="relative h-24 w-24 md:h-32 md:w-32 lg:h-40 lg:w-40 flex-shrink-0">
                   <Image
-                    src="/logo%20brizz.jpg"
+                    src="/logo-brizz.webp"
                     alt="Brizz"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 40px, (max-width: 1024px) 48px, 56px"
+                    width={160}
+                    height={160}
+                    className="object-contain h-full w-full"
+                    sizes="(max-width: 768px) 96px, (max-width: 1024px) 128px, 160px"
                   />
                 </div>
               </div>
