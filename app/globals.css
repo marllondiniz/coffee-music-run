@@ -179,7 +179,20 @@
     animation: scroll-infinite 30s linear infinite;
   }
   
+  .animate-scroll-infinite-mobile {
+    animation: scroll-infinite-mobile 50s linear infinite;
+  }
+  
   @keyframes scroll-infinite {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+  @keyframes scroll-infinite-mobile {
     0% {
       transform: translateX(0);
     }
