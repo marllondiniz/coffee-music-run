@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://coffee-music-run.vercel.app'),
+  metadataBase: new URL('https://ritmocertoclub.com.br'),
   title: 'Coffee Music & Run — Edição BRIZZ',
   description: 'Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade. Edição BRIZZ — 13 de dezembro, 6h30. Garanta seu ingresso.',
   keywords: ['corrida', 'café', 'música', 'comunidade', 'BRIZZ', 'Guarapari', 'functional', 'yoga', 'DJ'],
@@ -34,11 +34,11 @@ export const metadata: Metadata = {
     description: 'Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade. Edição BRIZZ — 13 de dezembro, 6h30.',
     type: 'website',
     locale: 'pt_BR',
-    url: 'https://coffee-music-run.vercel.app',
+    url: 'https://ritmocertoclub.com.br',
     siteName: 'Coffee Music & Run',
     images: [
       {
-        url: '/brizz.webp',
+        url: 'https://ritmocertoclub.com.br/brizz.webp',
         width: 1200,
         height: 630,
         alt: 'Coffee Music & Run — Edição BRIZZ',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Coffee Music & Run — Edição BRIZZ',
     description: 'Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade.',
-    images: ['/brizz.webp'],
+    images: ['https://ritmocertoclub.com.br/brizz.webp'],
   },
 }
 
