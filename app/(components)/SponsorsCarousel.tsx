@@ -11,8 +11,9 @@ const SPONSORS = [
 ]
 
 export function SponsorsCarousel() {
-  // Duplicar os patrocinadores para criar efeito infinito
-  const duplicatedSponsors = [...SPONSORS, ...SPONSORS]
+  // Duplicar os patrocinadores múltiplas vezes para criar efeito infinito suave
+  // Criar 3 cópias completas para garantir que todas apareçam
+  const duplicatedSponsors = [...SPONSORS, ...SPONSORS, ...SPONSORS]
 
   return (
     <div className="relative w-full overflow-hidden py-6 md:py-8 lg:py-10">

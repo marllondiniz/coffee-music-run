@@ -176,11 +176,11 @@
   }
   
   .animate-scroll-infinite {
-    animation: scroll-infinite 30s linear infinite;
+    animation: scroll-infinite 15s linear infinite;
   }
   
   .animate-scroll-infinite-mobile {
-    animation: scroll-infinite-mobile 50s linear infinite;
+    animation: scroll-infinite-mobile 25s linear infinite;
   }
   
   @keyframes scroll-infinite {
