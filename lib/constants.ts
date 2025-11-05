@@ -41,7 +41,7 @@ export const SCHEDULE = [
   { time: '8h00', title: 'Treino Funcional', description: 'Movimento em grupo, suor e muita energia', icon: '💪' },
   { time: '8h30', title: 'Café Especial', description: 'O momento de recarregar com café, matchá e shot imunidade', icon: '☕' },
   { time: '9h00', title: 'Sessão de Yoga', description: 'Relaxa, respira e conecta corpo e mente', icon: '🧘' },
-  { time: '9h30', title: 'DJ e Música', description: 'A vibe aumenta! DJ no comando e música alta', icon: '🎵' },
+  { time: '9h30', title: 'DJ e Música', description: 'A vibe aumenta! DJ no comando e a energia no máximo', icon: '🎵' },
   { time: '9h45', title: 'Massagem', description: 'Relaxa e recupera com massagem relaxante', icon: '💆' },
   { time: '10h00', title: 'Sorteios', description: 'Hora de sortear prêmios e brindes exclusivos!', icon: '🎁' },
 ]
