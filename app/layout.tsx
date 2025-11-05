@@ -16,19 +16,40 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://coffee-music-run.vercel.app'),
   title: 'Coffee Music & Run — Edição BRIZZ',
   description: 'Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade. Edição BRIZZ — 13 de dezembro, 6h30. Garanta seu ingresso.',
   keywords: ['corrida', 'café', 'música', 'comunidade', 'BRIZZ', 'Guarapari', 'functional', 'yoga', 'DJ'],
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon.png', sizes: '16x16', type: 'image/png' },
+    ],
+    shortcut: '/icon.png',
+    apple: '/logo-coffe-music.jpg',
+  },
   openGraph: {
     title: 'Coffee Music & Run — Edição BRIZZ',
     description: 'Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade. Edição BRIZZ — 13 de dezembro, 6h30.',
     type: 'website',
     locale: 'pt_BR',
+    url: 'https://coffee-music-run.vercel.app',
+    siteName: 'Coffee Music & Run',
+    images: [
+      {
+        url: '/brizz.webp',
+        width: 1200,
+        height: 630,
+        alt: 'Coffee Music & Run — Edição BRIZZ',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Coffee Music & Run — Edição BRIZZ',
     description: 'Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade.',
+    images: ['/brizz.webp'],
   },
 }
 
@@ -40,6 +61,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="scroll-smooth">
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
+        <link rel="shortcut icon" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/logo-coffe-music.jpg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
