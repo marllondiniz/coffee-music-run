@@ -41,20 +41,18 @@ export function Schedule() {
                 
                 {/* Content */}
                 <div className="flex-grow bg-neutral-900/80 backdrop-blur-sm border border-white/10 rounded-2xl p-6 md:p-8 hover:border-white/20 transition-all duration-300 shadow-lg group">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
-                    <div className="flex-1">
-                      <div className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100 mb-2">
-                        {item.time}
-                      </div>
-                      <div className="text-lg md:text-xl font-space text-neutral-300">
-                        {item.title}
-                      </div>
+                  <div className="flex flex-col gap-2 md:gap-3">
+                    <div className="text-2xl md:text-3xl font-orbitron font-bold text-neutral-100">
+                      {item.time}
                     </div>
-                    <div className="flex-shrink-0">
-                      <div className="inline-block px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-sm font-space text-neutral-300 uppercase tracking-wider">
-                        {item.icon} {item.title.split(' ')[0]}
-                      </div>
+                    <div className="text-lg md:text-xl font-orbitron font-bold text-neutral-100 mb-1">
+                      {item.title}
                     </div>
+                    {item.description && (
+                      <div className="text-base md:text-lg font-space text-neutral-300">
+                        {item.description}
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
