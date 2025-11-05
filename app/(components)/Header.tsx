@@ -61,13 +61,13 @@ export function Header() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div className="relative h-10 w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 rounded-full overflow-hidden">
+              <div className="relative h-14 w-14 md:h-12 md:w-12 lg:h-14 lg:w-14 rounded-full overflow-hidden">
                 <Image
                   src="/logo-coffe-music.jpg"
                   alt="Coffee Music & Run"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 40px, (max-width: 1024px) 48px, 56px"
+                  sizes="(max-width: 768px) 56px, (max-width: 1024px) 48px, 56px"
                   priority
                 />
               </div>

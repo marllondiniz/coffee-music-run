@@ -76,7 +76,7 @@ export function Newsletter() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-base md:text-lg lg:text-xl text-neutral-300 font-space max-w-2xl mx-auto"
           >
-            Receba novidades sobre próximos eventos, dicas de treino e tudo sobre a comunidade Coffee Music & Run
+            Receba novidades sobre próximos eventos e tudo sobre a comunidade Coffee Music & Run
           </motion.p>
 
           {isSubmitted ? (

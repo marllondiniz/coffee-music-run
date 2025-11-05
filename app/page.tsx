@@ -3,6 +3,7 @@ import { Hero } from './(components)/Hero'
 import { About } from './(components)/About'
 import { Tickets } from './(components)/Tickets'
 import { Schedule } from './(components)/Schedule'
+import { Location } from './(components)/Location'
 import { FAQ } from './(components)/FAQ'
 import { Sponsors } from './(components)/Sponsors'
 import { GalleryCarousel } from './(components)/GalleryCarousel'
@@ -19,6 +20,7 @@ export default function Home() {
       <GalleryCarousel />
       <Tickets />
       <Schedule />
+      <Location />
       <FAQ />
       <Sponsors />
       <Newsletter />
