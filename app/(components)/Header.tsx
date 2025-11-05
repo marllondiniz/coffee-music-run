@@ -68,7 +68,6 @@ export function Header() {
                   width={150}
                   height={75}
                   className="object-contain h-full w-auto"
-                  style={{ imageRendering: 'high-quality' }}
                   sizes="(max-width: 640px) 60px, 70px"
                   priority
                   unoptimized
@@ -111,7 +110,6 @@ export function Header() {
                 width={150}
                 height={75}
                 className="object-contain h-full w-auto"
-                style={{ imageRendering: 'high-quality' }}
                 sizes="(max-width: 1024px) 65px, 75px"
                 priority
                 unoptimized
