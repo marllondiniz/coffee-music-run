@@ -19,6 +19,18 @@ export async function saveQuizToGoogleSheets(quizData: {
 }) {
   try {
     // Verificar se as variáveis de ambiente estão configuradas
+    const hasClientEmail = !!process.env.GOOGLE_SHEETS_CLIENT_EMAIL
+    const hasPrivateKey = !!process.env.GOOGLE_SHEETS_PRIVATE_KEY
+    const hasSpreadsheetId = !!process.env.GOOGLE_SHEETS_SPREADSHEET_ID
+
+    if (!hasClientEmail || !hasPrivateKey || !hasSpreadsheetId) {
+      console.warn('Diagnóstico Google Sheets envs', {
+        hasClientEmail,
+        hasPrivateKey,
+        hasSpreadsheetId,
+      })
+    }
+
     if (
       !process.env.GOOGLE_SHEETS_CLIENT_EMAIL ||
       !process.env.GOOGLE_SHEETS_PRIVATE_KEY ||
