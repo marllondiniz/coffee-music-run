@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
 
     // 1. Salvar em arquivo JSON (backup local)
     try {
-      const dataDir = join(process.cwd(), 'data')
+      const isProduction = process.env.NODE_ENV === 'production'
+      const dataDir = isProduction ? join('/tmp', 'data') : join(process.cwd(), 'data')
       if (!existsSync(dataDir)) {
         await mkdir(dataDir, { recursive: true })
       }
