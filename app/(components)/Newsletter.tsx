@@ -29,12 +29,21 @@ export function Newsletter() {
 
     setIsSubmitting(true)
 
-    // Aqui você pode integrar com um serviço de newsletter (ex: Mailchimp, ConvertKit, etc)
-    // Por enquanto, apenas simulamos o envio
     try {
-      // Simular API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao cadastrar')
+      }
+
       setIsSubmitted(true)
       setEmail('')
       
@@ -43,7 +52,7 @@ export function Newsletter() {
         setIsSubmitted(false)
       }, 5000)
     } catch (err) {
-      setError('Erro ao cadastrar. Tente novamente.')
+      setError(err instanceof Error ? err.message : 'Erro ao cadastrar. Tente novamente.')
     } finally {
       setIsSubmitting(false)
     }

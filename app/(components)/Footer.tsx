@@ -71,9 +71,33 @@ export function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center text-sm text-neutral-400 font-space"
+          className="text-center space-y-3"
         >
-          © 2025 {EVENT_NAME}. Todos os direitos reservados.
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-neutral-400 font-space">
+            <a
+              href="/politica-de-privacidade"
+              className="hover:text-neutral-300 transition-colors"
+            >
+              Política de Privacidade
+            </a>
+            <span className="text-neutral-600">•</span>
+            <a
+              href="/termos-de-uso"
+              className="hover:text-neutral-300 transition-colors"
+            >
+              Termos de Uso
+            </a>
+            <span className="text-neutral-600">•</span>
+            <a
+              href="/cookies"
+              className="hover:text-neutral-300 transition-colors"
+            >
+              Cookies
+            </a>
+          </div>
+          <p className="text-sm text-neutral-400 font-space">
+            © 2025 {EVENT_NAME}. Todos os direitos reservados.
+          </p>
         </motion.div>
       </div>
     </footer>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Orbitron, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { EVENT_NAME, EVENT_DATE, EVENT_TIME, EVENT_LOCATION_NAME } from '@/lib/constants'
+import { CookieConsent } from './(components)/CookieConsent'
 
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -106,6 +107,7 @@ export default function RootLayout({
       </head>
       <body className={`${orbitron.variable} ${spaceGrotesk.variable} font-space antialiased`}>
         {children}
+        <CookieConsent />
         {/* Analytics placeholder */}
         {/* <Analytics /> */}
       </body>

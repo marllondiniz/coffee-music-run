@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { EVENT_DATE_ISO, TICKETS_URL } from '@/lib/constants'
 
 export function Header() {
@@ -47,33 +48,29 @@ export function Header() {
           {/* Mobile: Logo e Botão em coluna */}
           <div className="flex flex-col items-center justify-center w-full lg:hidden gap-3">
             {/* Logo */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="cursor-pointer"
-              onClick={() => {
-                window.scrollTo({
-                  top: 0,
-                  behavior: 'smooth'
-                })
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <div className="relative h-6 sm:h-7">
-                <Image
-                  src="/coffe-music.png"
-                  alt="Coffee Music & Run"
-                  width={150}
-                  height={75}
-                  className="object-contain h-full w-auto"
-                  sizes="(max-width: 640px) 60px, 70px"
-                  priority
-                  unoptimized
-                />
-              </div>
-            </motion.div>
+            <Link href="/">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="relative h-6 sm:h-7">
+                  <Image
+                    src="/coffe-music.png"
+                    alt="Coffee Music & Run"
+                    width={150}
+                    height={75}
+                    className="object-contain h-full w-auto"
+                    sizes="(max-width: 640px) 60px, 70px"
+                    priority
+                    unoptimized
+                  />
+                </div>
+              </motion.div>
+            </Link>
 
             {/* Counter Mobile */}
             <div className="flex items-center justify-center gap-2 sm:gap-3 w-full">
@@ -115,33 +112,29 @@ export function Header() {
           </div>
 
           {/* Desktop: Logo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="hidden lg:block cursor-pointer"
-            onClick={() => {
-              window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-              })
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <div className="relative h-7 md:h-8">
-              <Image
-                src="/coffe-music.png"
-                alt="Coffee Music & Run"
-                width={150}
-                height={75}
-                className="object-contain h-full w-auto"
-                sizes="(max-width: 1024px) 65px, 75px"
-                priority
-                unoptimized
-              />
-            </div>
-          </motion.div>
+          <Link href="/">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="hidden lg:block cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="relative h-7 md:h-8">
+                <Image
+                  src="/coffe-music.png"
+                  alt="Coffee Music & Run"
+                  width={150}
+                  height={75}
+                  className="object-contain h-full w-auto"
+                  sizes="(max-width: 1024px) 65px, 75px"
+                  priority
+                  unoptimized
+                />
+              </div>
+            </motion.div>
+          </Link>
 
           {/* Counter - Apenas Desktop */}
           <div className="hidden lg:flex items-center justify-center gap-3 w-auto">
