@@ -39,3 +39,6 @@ next-env.d.ts
 *.swp
 *.swo
 *~
+
+# Data files (quiz responses)
+/data

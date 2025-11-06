@@ -27,7 +27,12 @@ export default function QuizPage() {
     nome: '',
     data: '',
     assinatura: '',
+    idade: '',
   })
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [submitMessage, setSubmitMessage] = useState('')
 
   const hasYesAnswer = Object.values(answers).some(answer => answer === 'sim')
 
@@ -36,6 +41,74 @@ export default function QuizPage() {
   }
 
   const allAnswered = Object.values(answers).every(answer => answer !== null)
+
+  const canSubmit = allAnswered && 
+    (hasYesAnswer 
+      ? (termoData.nome && termoData.data && termoData.assinatura && termoData.idade)
+      : (formData.nome && formData.data && formData.assinatura && formData.idade))
+
+  const handleSubmit = async () => {
+    if (!canSubmit) return
+
+    setIsSubmitting(true)
+    setSubmitStatus('idle')
+    setSubmitMessage('')
+
+    try {
+      const response = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          answers,
+          formData: hasYesAnswer ? null : formData,
+          termoData: hasYesAnswer ? termoData : null,
+          hasYesAnswer,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao salvar quiz')
+      }
+
+      setSubmitStatus('success')
+      setSubmitMessage('Quiz salvo com sucesso!')
+      
+      // Limpar formulário após 3 segundos
+      setTimeout(() => {
+        setAnswers({
+          1: null,
+          2: null,
+          3: null,
+          4: null,
+          5: null,
+          6: null,
+          7: null,
+        })
+        setFormData({
+          nome: '',
+          data: '',
+          assinatura: '',
+          idade: '',
+        })
+        setTermoData({
+          nome: '',
+          data: '',
+          assinatura: '',
+          idade: '',
+        })
+        setSubmitStatus('idle')
+      }, 3000)
+    } catch (error) {
+      setSubmitStatus('error')
+      setSubmitMessage(error instanceof Error ? error.message : 'Erro ao salvar quiz. Tente novamente.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <main className="min-h-screen">
@@ -138,7 +211,7 @@ export default function QuizPage() {
                 </div>
               </section>
 
-              {allAnswered && (
+              {allAnswered && !hasYesAnswer && (
                 <motion.section
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -233,17 +306,31 @@ export default function QuizPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-neutral-300 font-space mb-2">
-                        Nome completo *
-                      </label>
-                      <input
-                        type="text"
-                        value={termoData.nome}
-                        onChange={(e) => setTermoData(prev => ({ ...prev, nome: e.target.value }))}
-                        className="w-full px-4 py-3 bg-neutral-800 border border-white/10 rounded-lg text-neutral-100 font-space focus:outline-none focus:border-white/30"
-                        placeholder="Digite seu nome completo"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-neutral-300 font-space mb-2">
+                          Nome completo *
+                        </label>
+                        <input
+                          type="text"
+                          value={termoData.nome}
+                          onChange={(e) => setTermoData(prev => ({ ...prev, nome: e.target.value }))}
+                          className="w-full px-4 py-3 bg-neutral-800 border border-white/10 rounded-lg text-neutral-100 font-space focus:outline-none focus:border-white/30"
+                          placeholder="Digite seu nome completo"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-neutral-300 font-space mb-2">
+                          Idade *
+                        </label>
+                        <input
+                          type="number"
+                          value={termoData.idade}
+                          onChange={(e) => setTermoData(prev => ({ ...prev, idade: e.target.value }))}
+                          className="w-full px-4 py-3 bg-neutral-800 border border-white/10 rounded-lg text-neutral-100 font-space focus:outline-none focus:border-white/30"
+                          placeholder="Digite sua idade"
+                        />
+                      </div>
                     </div>
                     
                     <div>
@@ -280,9 +367,73 @@ export default function QuizPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-green-900/20 border-2 border-green-500/50 rounded-xl p-6 md:p-8"
                 >
-                  <p className="text-green-300 font-space text-lg">
+                  <p className="text-green-300 font-space text-lg mb-4">
                     ✅ Parabéns! Você respondeu "NÃO" a todas as perguntas. Você está apto para participar das atividades físicas do evento.
                   </p>
+                </motion.div>
+              )}
+
+              {allAnswered && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center gap-4"
+                >
+                  {submitStatus === 'success' && (
+                    <div className="bg-green-900/20 border-2 border-green-500/50 rounded-xl p-4 w-full">
+                      <p className="text-green-300 font-space text-center">
+                        ✅ {submitMessage}
+                      </p>
+                    </div>
+                  )}
+
+                  {submitStatus === 'error' && (
+                    <div className="bg-red-900/20 border-2 border-red-500/50 rounded-xl p-4 w-full">
+                      <p className="text-red-300 font-space text-center">
+                        ❌ {submitMessage}
+                      </p>
+                    </div>
+                  )}
+
+                  <motion.button
+                    onClick={handleSubmit}
+                    disabled={!canSubmit || isSubmitting}
+                    whileHover={canSubmit ? { scale: 1.05 } : {}}
+                    whileTap={canSubmit ? { scale: 0.95 } : {}}
+                    className={`px-8 py-4 rounded-xl font-orbitron font-bold text-lg uppercase transition-all ${
+                      canSubmit && !isSubmitting
+                        ? 'bg-white text-neutral-950 hover:bg-neutral-100'
+                        : 'bg-neutral-800 text-neutral-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <svg
+                          className="animate-spin h-5 w-5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Salvando...
+                      </span>
+                    ) : (
+                      'Salvar Quiz'
+                    )}
+                  </motion.button>
                 </motion.div>
               )}
             </div>
