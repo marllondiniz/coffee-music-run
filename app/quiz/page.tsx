@@ -284,9 +284,17 @@ export default function QuizPage() {
                   </section>
 
                   <section>
-                <h2 className="text-2xl font-orbitron font-bold text-neutral-100 mb-6 text-center md:text-left">
-                  Corrida e Performance
-                </h2>
+                <div className="flex flex-col items-center md:items-start gap-3 mb-6">
+                  <span className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-orbitron uppercase tracking-[0.3em] text-neutral-200">
+                    Etapa 2
+                  </span>
+                  <h2 className="text-2xl font-orbitron font-bold text-neutral-100 text-center md:text-left">
+                    Corrida e Performance
+                  </h2>
+                  <p className="text-neutral-400 font-space text-sm text-center md:text-left max-w-2xl">
+                    Agora queremos saber mais sobre seu perfil de corrida. Responda para personalizarmos a experiência no Coffee Music & Run.
+                  </p>
+                </div>
 
                 <div className="space-y-6">
                   <motion.div
@@ -743,16 +751,26 @@ export default function QuizPage() {
                   <p className="text-neutral-300 font-space">
                     Acompanhe tudo que vai rolar no Coffee Music & Run
                   </p>
-                  <motion.a
-                    href="https://www.instagram.com/coffeemusicand_/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-neutral-950 font-orbitron font-bold uppercase"
-                  >
-                    👉 Seguir no Instagram
-                  </motion.a>
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <motion.a
+                      href="https://www.instagram.com/coffeemusicand_/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-neutral-950 font-orbitron font-bold uppercase"
+                    >
+                      👉 Seguir no Instagram
+                    </motion.a>
+                    <motion.a
+                      href="/"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/40 text-neutral-200 font-orbitron font-bold uppercase"
+                    >
+                      ← Voltar para Home
+                    </motion.a>
+                  </div>
                 </motion.div>
               )}
             </div>
