@@ -78,9 +78,6 @@ export function Header() {
 
               {/* Counter Mobile */}
               <div className="flex items-center justify-center gap-2 sm:gap-3 w-full">
-                <div className="text-xs sm:text-sm font-space text-neutral-300">
-                  Faltam:
-                </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   {[
                     { label: 'D', value: timeLeft.days },
@@ -142,9 +139,6 @@ export function Header() {
 
             {/* Counter - Desktop */}
             <div className="hidden lg:flex items-center justify-center gap-3 w-auto">
-              <div className="text-sm font-space text-neutral-300">
-                Faltam:
-              </div>
               <div className="flex items-center gap-3">
                 {[
                   { label: 'D', value: timeLeft.days },
