@@ -204,7 +204,9 @@ export default function QuizPage() {
             </div>
 
             <div className="space-y-8">
-              <section>
+              {!showThankYou ? (
+                <>
+                  <section>
                 <h2 className="text-2xl font-orbitron font-bold text-neutral-100 mb-6 text-center md:text-left">
                   Por favor, assinale "SIM" ou "NÃO" às seguintes perguntas:
                 </h2>
@@ -279,9 +281,9 @@ export default function QuizPage() {
                     </motion.div>
                   ))}
                 </div>
-              </section>
+                  </section>
 
-              <section>
+                  <section>
                 <h2 className="text-2xl font-orbitron font-bold text-neutral-100 mb-6 text-center md:text-left">
                   Corrida e Performance
                 </h2>
@@ -309,7 +311,7 @@ export default function QuizPage() {
                         whileTap={{ scale: 0.95 }}
                         className={`px-6 py-3 rounded-lg font-orbitron font-bold text-sm uppercase transition-all ${
                           runningData.runsFrequently === 'sim'
-                            ? 'bg-red-600 text-white border-2 border-red-500'
+                            ? 'bg-white text-neutral-950 border-2 border-white'
                             : 'bg-neutral-800 text-neutral-300 border-2 border-white/20 hover:border-white/40'
                         }`}
                       >
@@ -327,7 +329,7 @@ export default function QuizPage() {
                         whileTap={{ scale: 0.95 }}
                         className={`px-6 py-3 rounded-lg font-orbitron font-bold text-sm uppercase transition-all ${
                           runningData.runsFrequently === 'nao'
-                            ? 'bg-green-600 text-white border-2 border-green-500'
+                            ? 'bg-white text-neutral-950 border-2 border-white'
                             : 'bg-neutral-800 text-neutral-300 border-2 border-white/20 hover:border-white/40'
                         }`}
                       >
@@ -508,9 +510,9 @@ export default function QuizPage() {
                     )}
                   </motion.div>
                 </div>
-              </section>
+                  </section>
 
-              {allAnswered && runningSectionComplete && !hasYesAnswer && (
+                  {allAnswered && runningSectionComplete && !hasYesAnswer && (
                 <motion.section
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -575,9 +577,9 @@ export default function QuizPage() {
                     </div>
                   </div>
                 </motion.section>
-              )}
+                  )}
 
-              {hasYesAnswer && allAnswered && runningSectionComplete && (
+                  {hasYesAnswer && allAnswered && runningSectionComplete && (
                 <motion.section
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -658,9 +660,9 @@ export default function QuizPage() {
                     </div>
                   </div>
                 </motion.section>
-              )}
+                  )}
 
-              {allAnswered && !hasYesAnswer && (
+                  {allAnswered && !hasYesAnswer && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -670,9 +672,9 @@ export default function QuizPage() {
                     ✅ Parabéns! Você respondeu "NÃO" a todas as perguntas. Você está apto para participar das atividades físicas do evento.
                   </p>
                 </motion.div>
-              )}
+                  )}
 
-              {allAnswered && (
+                  {allAnswered && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -726,9 +728,10 @@ export default function QuizPage() {
                     )}
                   </motion.button>
                 </motion.div>
-              )}
+                  )}
 
-              {showThankYou && (
+                </>
+              ) : (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
