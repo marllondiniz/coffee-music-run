@@ -90,6 +90,52 @@ export default function QuizPage() {
     }
   }, [])
 
+  if (showThankYou) {
+    return (
+      <main className="min-h-screen">
+        <Header />
+        <div className="pt-32 pb-20 px-6 md:px-12" ref={quizTopRef}>
+          <div className="max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="bg-neutral-900/60 border border-white/10 rounded-xl p-8 md:p-10 flex flex-col items-center text-center gap-6"
+            >
+              <h1 className="text-3xl md:text-4xl font-orbitron font-bold text-neutral-100">
+                Obrigado por preencher o questionário!
+              </h1>
+              <p className="text-neutral-300 font-space text-lg max-w-2xl">
+                Acompanhe tudo que vai rolar no Coffee Music & Run
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <motion.a
+                  href="https://www.instagram.com/coffeemusicand_/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-neutral-950 font-orbitron font-bold uppercase"
+                >
+                  👉 Seguir no Instagram
+                </motion.a>
+                <motion.a
+                  href="/"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/20 text-neutral-200 font-orbitron font-bold uppercase"
+                >
+                  ← Voltar para Home
+                </motion.a>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
+
   const canSubmit = allAnswered && runningSectionComplete &&
     (hasYesAnswer 
       ? (termoData.nome && termoData.data && termoData.assinatura && termoData.idade)
