@@ -245,8 +245,8 @@ export default function QuizPage() {
               Questionário de Prontidão para Atividade Física (PAR-Q)
             </h1>
             
-            <div className="bg-neutral-900/50 border border-white/10 rounded-xl p-6 md:p-8 mb-8">
-              <p className="text-neutral-300 font-space leading-relaxed">
+                <div className="bg-neutral-900/50 border border-white/10 rounded-xl p-6 md:p-8 mb-8">
+                  <p className="text-neutral-300 font-space leading-relaxed text-center md:text-left">
                 Este questionário tem como objetivo identificar a necessidade de avaliação médica antes de iniciar atividade física. 
                 Se você responder <strong className="text-white">"SIM"</strong> a uma ou mais perguntas, você deve consultar seu médico{' '}
                 <strong className="text-white">ANTES</strong> de aumentar seu nível atual de atividade física. 
