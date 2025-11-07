@@ -30,6 +30,11 @@ export default function QuizPage() {
     idade: '',
   })
 
+  const today = new Date().toISOString().split('T')[0]
+
+  const dateInputClasses =
+    'w-full px-4 py-3 bg-neutral-800 border border-white/10 rounded-lg text-neutral-100 font-space focus:outline-none focus:border-white/30 appearance-none [color-scheme:dark]'
+
   const createInitialRunningData = () => ({
     runsFrequently: '',
     weeklyFrequency: '',
@@ -607,13 +612,14 @@ export default function QuizPage() {
                     
                     <div>
                       <label className="block text-neutral-300 font-space mb-2">
-                        Data *
+                        Data de nascimento *
                       </label>
                       <input
                         type="date"
+                        max={today}
                         value={formData.data}
                         onChange={(e) => setFormData(prev => ({ ...prev, data: e.target.value }))}
-                        className="w-full px-4 py-3 bg-neutral-800 border border-white/10 rounded-lg text-neutral-100 font-space focus:outline-none focus:border-white/30"
+                        className={dateInputClasses}
                       />
                     </div>
                     
@@ -690,13 +696,14 @@ export default function QuizPage() {
                     
                     <div>
                       <label className="block text-neutral-300 font-space mb-2">
-                        Data *
+                        Data de nascimento *
                       </label>
                       <input
                         type="date"
+                        max={today}
                         value={termoData.data}
                         onChange={(e) => setTermoData(prev => ({ ...prev, data: e.target.value }))}
-                        className="w-full px-4 py-3 bg-neutral-800 border border-white/10 rounded-lg text-neutral-100 font-space focus:outline-none focus:border-white/30"
+                        className={dateInputClasses}
                       />
                     </div>
                     
