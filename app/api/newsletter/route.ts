@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,26 +51,8 @@ export async function POST(request: NextRequest) {
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'Coffee Music <no-reply@ritmocertoclub.com.br>'
         const notificationFromEmail = process.env.RESEND_FROM_EMAIL || 'Coffee Music <no-reply@ritmocertoclub.com.br>'
     
-    // Carregar a imagem e converter para base64
-    let bannerImageBase64 = ''
-    try {
-      const imagePath = join(process.cwd(), 'public', 'banner-bemvindo.png')
-      const imageBuffer = readFileSync(imagePath)
-      bannerImageBase64 = imageBuffer.toString('base64')
-      console.log(`Imagem carregada com sucesso. Tamanho: ${bannerImageBase64.length} caracteres`)
-    } catch (imageError) {
-      console.error('Erro ao carregar imagem:', imageError)
-      console.error('Caminho tentado:', join(process.cwd(), 'public', 'banner-bemvindo.png'))
-      // Continuar sem imagem se houver erro
-    }
-    
-    const bannerImageDataUri = bannerImageBase64 
-      ? `data:image/png;base64,${bannerImageBase64}`
-      : ''
-    
-    if (!bannerImageDataUri) {
-      console.warn('Aviso: bannerImageDataUri está vazio - a imagem não será exibida no email')
-    }
+    const siteBaseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://ritmocertoclub.com.br'
+    const bannerImageUrl = `${siteBaseUrl}/banner-bemvindo.png`
     
     const { data, error } = await resend.emails.send({
       from: fromEmail,
@@ -87,11 +67,9 @@ export async function POST(request: NextRequest) {
             <title>Bem-vindo à Newsletter</title>
           </head>
           <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            ${bannerImageDataUri ? `
             <div style="text-align: center; margin-bottom: 0;">
-              <img src="${bannerImageDataUri}" alt="Coffee Music & Run - Bem-vindo" style="max-width: 100%; height: auto; border-radius: 10px; display: block; margin: 0 auto;" />
+              <img src="${bannerImageUrl}" alt="Coffee Music & Run - Bem-vindo" style="max-width: 100%; height: auto; border-radius: 10px; display: block; margin: 0 auto;" />
             </div>
-            ` : ''}
             <div style="background: #fff; padding: 30px; border-radius: 0 0 10px 10px;">
               <h2 style="color: #000; margin-top: 0;">Bem-vindo à nossa comunidade! 🎉</h2>
               <p>Olá!</p>
