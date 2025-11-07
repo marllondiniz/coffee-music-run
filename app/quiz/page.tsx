@@ -133,7 +133,7 @@ export default function QuizPage() {
       setShowThankYou(true)
 
       if (typeof window !== 'undefined') {
-        scrollTimeoutRef.current = window.setTimeout(() => {
+        scrollTimeoutRef.current = setTimeout(() => {
           if (quizTopRef.current) {
             window.scrollTo({
               top: quizTopRef.current.offsetTop,
