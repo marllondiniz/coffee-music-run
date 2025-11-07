@@ -48,7 +48,31 @@ export const SCHEDULE = [
 export const FAQ_ITEMS = [
   {
     question: 'Como faço para retirar meu kit e camisa?',
-    answer: 'O kit de retirada será disponibilizado no local do evento, no dia 13 de dezembro, a partir das 6h30. Apresente seu comprovante de compra no check-in.',
+    answerHtml: `
+      <div class="space-y-4 text-sm md:text-base text-neutral-300 font-space leading-relaxed">
+        <div class="space-y-2">
+          <p>Para retirar seu kit e camisa, siga as orientações abaixo:</p>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl" role="img" aria-hidden="true">👕</span>
+            <div class="space-y-1">
+              <p class="text-neutral-100 font-semibold">Retirada de Camisas</p>
+              <p>Local: Mangalô</p>
+              <p>Datas: Quinta (11/12) e Sexta (12/12)</p>
+              <p>Horário: 8h às 18h</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl" role="img" aria-hidden="true">📍</span>
+            <div class="space-y-1">
+              <p class="text-neutral-100 font-semibold">Entrega de Kits no Dia do Evento</p>
+              <p>Data: Sábado, 13/12</p>
+              <p>Local: Brizz</p>
+              <p>Horário: 6h às 9h</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
   },
   {
     question: 'Qual o nível de dificuldade da corrida?',
@@ -56,7 +80,7 @@ export const FAQ_ITEMS = [
   },
   {
     question: 'Crianças podem participar?',
-    answer: 'Sim! O evento é para toda a família. Crianças acompanhadas de responsáveis podem participar gratuitamente e aproveitar o café, yoga e demais atividades.',
+    answer: 'Permitida a entrada apenas para maiores de 18 anos. Crianças não são permitidas.',
   },
   {
     question: 'O que acontece em caso de chuva?',
@@ -64,7 +88,7 @@ export const FAQ_ITEMS = [
   },
   {
     question: 'Posso cancelar e receber reembolso?',
-    answer: 'Reembolsos são aceitos até 7 dias antes do evento. Entre em contato através do WhatsApp para solicitar o cancelamento.',
+    answer: 'O reembolso é realizado diretamente pela ticketeria, conforme as políticas da própria Zig.',
   },
   {
     question: 'Preciso estar em boa forma física para participar?',

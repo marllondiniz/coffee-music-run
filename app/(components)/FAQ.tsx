@@ -49,9 +49,16 @@ export function FAQ() {
                   transition={{ duration: 0.3 }}
                   className="px-6 md:px-8 pb-4 md:pb-6"
                 >
-                  <p className="text-sm md:text-base text-neutral-300 font-space leading-relaxed">
-                    {item.answer}
-                  </p>
+                  {item.answerHtml ? (
+                    <div
+                      className="text-sm md:text-base text-neutral-300 font-space leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: item.answerHtml }}
+                    />
+                  ) : (
+                    <p className="text-sm md:text-base text-neutral-300 font-space leading-relaxed">
+                      {item.answer}
+                    </p>
+                  )}
                 </motion.div>
               )}
             </motion.div>
