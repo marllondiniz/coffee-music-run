@@ -8,7 +8,7 @@ import { saveQuizToGoogleSheets } from '@/lib/googleSheets'
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    const { answers, formData, termoData, hasYesAnswer } = data
+    const { answers, formData, termoData, hasYesAnswer, runningData } = data
 
     // Determinar qual conjunto de dados usar
     const userData = hasYesAnswer ? termoData : formData
@@ -22,6 +22,14 @@ export async function POST(request: NextRequest) {
     }
 
     const timestamp = new Date().toISOString()
+    const normalizedRunningData = {
+      runsFrequently: runningData?.runsFrequently || '',
+      weeklyFrequency: runningData?.weeklyFrequency || '',
+      runningExperience: runningData?.runningExperience || '',
+      longestDistance: runningData?.longestDistance || '',
+      hasRunningInjury: runningData?.hasRunningInjury || '',
+      injuryDetails: runningData?.injuryDetails || '',
+    }
     const quizData = {
       timestamp,
       nome: userData.nome,
@@ -31,6 +39,7 @@ export async function POST(request: NextRequest) {
       answers,
       hasYesAnswer,
       termoAssinado: hasYesAnswer ? true : false,
+      running: normalizedRunningData,
     }
 
     // 1. Salvar em arquivo JSON (backup local)
@@ -69,7 +78,7 @@ export async function POST(request: NextRequest) {
     if (process.env.RESEND_API_KEY && process.env.RESEND_NOTIFICATION_EMAIL) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY)
-        const fromEmail = process.env.RESEND_FROM_EMAIL || 'Coffee Music <onboarding@resend.dev>'
+        const fromEmail = process.env.RESEND_FROM_EMAIL || 'Coffee Music <no-reply@ritmocertoclub.com.br>'
         
         // Formatar respostas para o email
         const answersText = Object.entries(answers)
@@ -87,6 +96,26 @@ export async function POST(request: NextRequest) {
           })
           .join('<br>')
 
+        const formatYesNo = (value: string) => {
+          if (value === 'sim') return 'Sim'
+          if (value === 'nao') return 'Não'
+          return value || 'Não informado'
+        }
+
+        const runningDetailsHtml = `
+          <h3>Corrida e Performance</h3>
+          <p><strong>Corre com frequência:</strong> ${formatYesNo(normalizedRunningData.runsFrequently)}</p>
+          <p><strong>Frequência semanal:</strong> ${normalizedRunningData.weeklyFrequency || 'Não informado'}</p>
+          <p><strong>Tempo de prática:</strong> ${normalizedRunningData.runningExperience || 'Não informado'}</p>
+          <p><strong>Maior distância:</strong> ${normalizedRunningData.longestDistance || 'Não informado'}</p>
+          <p><strong>Lesão relacionada à corrida:</strong> ${formatYesNo(normalizedRunningData.hasRunningInjury)}</p>
+          ${
+            normalizedRunningData.hasRunningInjury === 'sim'
+              ? `<p><strong>Detalhes da lesão:</strong> ${normalizedRunningData.injuryDetails || 'Não informado'}</p>`
+              : ''
+          }
+        `
+
         await resend.emails.send({
           from: fromEmail,
           to: process.env.RESEND_NOTIFICATION_EMAIL,
@@ -97,6 +126,7 @@ export async function POST(request: NextRequest) {
             <p><strong>Idade:</strong> ${userData.idade || 'Não informado'}</p>
             <p><strong>Data:</strong> ${userData.data}</p>
             <p><strong>Assinatura:</strong> ${userData.assinatura}</p>
+            ${runningDetailsHtml}
             
             <h3>Respostas:</h3>
             ${answersText}

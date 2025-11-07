@@ -16,6 +16,14 @@ export async function saveQuizToGoogleSheets(quizData: {
   answers: { [key: number]: 'sim' | 'nao' }
   hasYesAnswer: boolean
   termoAssinado: boolean
+  running: {
+    runsFrequently: string
+    weeklyFrequency: string
+    runningExperience: string
+    longestDistance: string
+    hasRunningInjury: string
+    injuryDetails: string
+  }
 }) {
   try {
     // Verificar se as variáveis de ambiente estão configuradas
@@ -57,6 +65,12 @@ export async function saveQuizToGoogleSheets(quizData: {
       return answer === 'sim' ? 'SIM' : answer === 'nao' ? 'NÃO' : ''
     })
 
+    const formatYesNo = (value: string) => {
+      if (value === 'sim') return 'SIM'
+      if (value === 'nao') return 'NÃO'
+      return value || ''
+    }
+
     const row = [
       quizData.timestamp,
       quizData.nome,
@@ -66,6 +80,12 @@ export async function saveQuizToGoogleSheets(quizData: {
       quizData.hasYesAnswer ? 'SIM' : 'NÃO',
       quizData.termoAssinado ? 'SIM' : 'NÃO',
       ...answersForSheet, // Exatamente 7 respostas (Perguntas 1 a 7)
+      formatYesNo(quizData.running?.runsFrequently),
+      quizData.running?.weeklyFrequency || '',
+      quizData.running?.runningExperience || '',
+      quizData.running?.longestDistance || '',
+      formatYesNo(quizData.running?.hasRunningInjury),
+      quizData.running?.injuryDetails || '',
     ]
 
     // Verificar se a planilha tem cabeçalhos, se não tiver, criar
@@ -94,6 +114,12 @@ export async function saveQuizToGoogleSheets(quizData: {
           'Pergunta 5',
           'Pergunta 6',
           'Pergunta 7',
+          'Corre com frequência?',
+          'Frequência semanal',
+          'Tempo de prática',
+          'Maior distância percorrida',
+          'Lesão relacionada à corrida?',
+          'Detalhes da lesão',
         ]
 
         await sheets.spreadsheets.values.append({

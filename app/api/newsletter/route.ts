@@ -50,7 +50,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Enviar email de confirmação para o usuário
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Coffee Music <onboarding@resend.dev>'
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Coffee Music <no-reply@ritmocertoclub.com.br>'
+        const notificationFromEmail = process.env.RESEND_FROM_EMAIL || 'Coffee Music <no-reply@ritmocertoclub.com.br>'
     
     // Carregar a imagem e converter para base64
     let bannerImageBase64 = ''
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
     if (process.env.RESEND_NOTIFICATION_EMAIL) {
       try {
         await resend.emails.send({
-          from: fromEmail,
+          from: notificationFromEmail,
           to: process.env.RESEND_NOTIFICATION_EMAIL,
           subject: 'Nova inscrição na Newsletter',
           html: `
