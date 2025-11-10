@@ -40,7 +40,7 @@ export function About() {
             >
               <div className="relative h-16 md:h-20 w-auto">
                 <Image
-                  src="/logo%20brizz.jpg"
+                  src="/logo-briss.webp"
                   alt="Brizz - Cultura & Gastronomia"
                   fill
                   className="object-contain"

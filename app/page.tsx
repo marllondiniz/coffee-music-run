@@ -60,7 +60,7 @@ export default function Home() {
         }
 
         setFeedback({ type: 'success', text: 'Login realizado com sucesso!' })
-        router.push('/brizz')
+        router.push('/inicio')
       }
 
       if (mode === 'signUp') {
@@ -84,7 +84,7 @@ export default function Home() {
 
       if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: origin ? `${origin}/brizz` : undefined,
+          redirectTo: origin ? `${origin}/inicio` : undefined,
         })
 
         if (error) {
