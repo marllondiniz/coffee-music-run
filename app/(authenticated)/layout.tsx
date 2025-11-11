@@ -91,7 +91,7 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
       setLoggingOut(true)
       const supabase = getSupabaseClient()
       await supabase.auth.signOut()
-      router.push('/')
+      router.push('/testeapp')
     } catch (error) {
       console.error('Erro ao sair:', error)
     } finally {
@@ -99,10 +99,16 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
     }
   }
 
+  const isAdminRoute = pathname?.startsWith('/admin')
+
+  if (isAdminRoute) {
+    return <>{children}</>
+  }
+
   return (
-    <div className="min-h-screen w-full bg-[#0f0f10] text-[#f5f5f5] flex justify-center">
-      <div className="flex min-h-screen w-full max-w-[480px] flex-col bg-[#0f0f10]">
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/10 bg-[#0f0f10]/95 px-5 py-4 backdrop-blur">
+    <div className="min-h-screen w-full bg-[#0f0f10] text-[#f5f5f5] flex justify-center px-0 md:px-4 lg:px-6">
+      <div className="flex min-h-screen w-full max-w-[480px] flex-col bg-[#0f0f10] md:max-w-4xl lg:max-w-5xl">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/10 bg-[#0f0f10]/95 px-5 py-4 backdrop-blur md:px-8 lg:px-10">
           <div className="w-10" aria-hidden />
           <div className="flex items-center justify-center">
             <Image
@@ -125,10 +131,10 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
           </button>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-5 pb-28 pt-6">{children}</main>
+        <main className="flex-1 overflow-y-auto px-5 pb-28 pt-6 md:px-8 lg:px-10">{children}</main>
 
         <nav className="fixed inset-x-0 bottom-0 z-30 flex justify-center border-t border-white/10 bg-[#0f0f10]/95 backdrop-blur">
-          <div className="grid h-20 w-full max-w-[480px] grid-cols-5">
+          <div className="grid h-20 w-full max-w-[480px] grid-cols-5 md:max-w-4xl lg:max-w-5xl">
             {navItemsToDisplay.map((item) => {
               const isActive =
                 activeItem.href === item.href && activeItem.label === item.label
@@ -142,14 +148,14 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
                 >
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-full transition ${
-                      isActive ? 'bg-[#f4c542] text-[#0f0f10]' : 'bg-transparent text-[#f5f5f5]'
+                      isActive ? 'bg-[#f5f5f5] text-[#0f0f10]' : 'bg-transparent text-[#f5f5f5]'
                     }`}
                   >
                     <Icon size={20} className={isActive ? 'stroke-[2.5]' : 'opacity-80'} />
                   </div>
                   <span
                     className={`text-[11px] uppercase tracking-wider ${
-                      isActive ? 'text-[#f4c542]' : 'text-[#9a9aa2]'
+                      isActive ? 'text-[#f5f5f5]' : 'text-[#9a9aa2]'
                     }`}
                   >
                     {item.label}

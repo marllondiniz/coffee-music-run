@@ -1,29 +1,6 @@
-'use client'
-
 import Link from 'next/link'
-
-const destaques = [
-  {
-    id: 'next-event',
-    titulo: 'Próximo encontro confirmado',
-    descricao: 'Coffee Music & Run • 13.Dez • 6h • BRIZZ',
-    acao: 'Ver detalhes',
-    emphasize: true,
-  },
-  {
-    id: 'pontos',
-    titulo: 'Ritmo Points acumulados',
-    descricao: '120 pontos • Você está no top 15% da comunidade.',
-    acao: 'Ver ranking',
-  },
-  {
-    id: 'desafio',
-    titulo: 'Desafio da semana',
-    descricao: 'Corra 5 km e compartilhe a energia no feed.',
-    acao: 'Ver desafios',
-    href: '/desafios',
-  },
-]
+import { getChallenges, getChallengeProgress, getEvents } from '@/lib/queries'
+import { getSupabaseServer } from '@/lib/supabaseServer'
 
 const quickLinks = [
   { id: 'eventos', titulo: 'Eventos', descricao: 'Escolha sua próxima experiência.', href: '/eventos' },
@@ -31,11 +8,75 @@ const quickLinks = [
   { id: 'clube', titulo: 'Clube', descricao: 'Benefícios e histórias da comunidade.', href: '/clube' },
 ]
 
-export default function InicioPage() {
+function formatEventHighlight(date: string | null, title?: string | null, local?: string | null) {
+  if (!date) return title ?? 'Evento em breve'
+  const formatter = new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  return `${title ?? 'Evento especial'} • ${formatter.format(new Date(date)).replace('.', '')} • ${
+    local ?? 'Local a confirmar'
+  }`
+}
+
+export default async function InicioPage() {
+  const supabase = getSupabaseServer()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const [eventos, desafios, progressoUsuario] = await Promise.all([
+    getEvents(),
+    getChallenges(),
+    user ? getChallengeProgress(user.id) : Promise.resolve([]),
+  ])
+
+  const proximoEvento = eventos[0]
+  const desafioSemana = desafios[0]
+  const totalPontos = progressoUsuario.reduce((acc, registro) => acc + (registro.progresso ?? 0), 0)
+
+  const destaques = [
+    {
+      id: 'next-event',
+      titulo: 'Próximo encontro confirmado',
+      descricao: proximoEvento
+        ? formatEventHighlight(
+            proximoEvento.data_horario,
+            proximoEvento.titulo,
+            proximoEvento.local_nome
+          )
+        : 'Fique ligado: novos eventos em breve.',
+      acao: 'Ver detalhes',
+      href: proximoEvento ? '/eventos' : undefined,
+      emphasize: true,
+    },
+    {
+      id: 'pontos',
+      titulo: 'Ritmo Points acumulados',
+      descricao:
+        totalPontos > 0
+          ? `${totalPontos} pontos • Continue no ritmo!`
+          : 'Você ainda não acumulou pontos esta semana.',
+      acao: 'Ver ranking',
+      href: '/desafios',
+    },
+    {
+      id: 'desafio',
+      titulo: 'Desafio da semana',
+      descricao: desafioSemana
+        ? desafioSemana.descricao ?? 'Entre, marque presença e some pontos.'
+        : 'Novos desafios chegam toda semana.',
+      acao: 'Ver desafios',
+      href: '/desafios',
+    },
+  ]
+
   return (
     <section className="space-y-6">
       <header className="space-y-2 text-center">
-        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[#f4c542]">
+        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[#f5f5f5]/80">
           Ritmo certo club
         </span>
         <h2 className="text-2xl font-bold uppercase tracking-tight text-[#f5f5f5]">
@@ -46,14 +87,14 @@ export default function InicioPage() {
         </p>
       </header>
 
-      <div className="space-y-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {destaques.map((card) => (
           <div
             key={card.id}
-            className={`rounded-3xl border border-white/5 p-5 shadow-lg ${
+            className={`rounded-lg border border-white/5 p-5 shadow-lg transition ${
               card.emphasize
-                ? 'bg-gradient-to-r from-[#f5d36b] to-[#f4c542] text-[#0f0f10]'
-                : 'bg-[#18181b]'
+                ? 'bg-gradient-to-r from-[#f5f5f5] to-[#dcdcdc] text-[#0f0f10]'
+                : 'bg-[#18181b] hover:border-white/30'
             }`}
           >
             <h3
@@ -74,7 +115,7 @@ export default function InicioPage() {
               <Link
                 href={card.href}
                 className={`mt-4 inline-flex items-center text-xs font-semibold uppercase tracking-wider ${
-                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f4c542]'
+                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
                 }`}
               >
                 {card.acao}
@@ -82,7 +123,7 @@ export default function InicioPage() {
             ) : (
               <span
                 className={`mt-4 inline-flex text-xs font-semibold uppercase tracking-wider ${
-                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f4c542]'
+                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
                 }`}
               >
                 {card.acao}
@@ -92,22 +133,22 @@ export default function InicioPage() {
         ))}
       </div>
 
-      <div className="rounded-3xl border border-white/5 bg-[#18181b] p-5 shadow-lg">
+      <div className="rounded-lg border border-white/5 bg-[#18181b] p-5 shadow-lg md:p-6">
         <div className="flex items-center justify-between">
           <div>
             <span className="text-xs uppercase tracking-[0.3em] text-[#9a9aa2]">Sua constância</span>
             <h3 className="mt-2 text-lg font-semibold text-[#f5f5f5]">Ritmo das últimas 4 semanas</h3>
           </div>
-          <span className="rounded-full bg-[#0f0f10] px-3 py-1 text-xs font-semibold text-[#f4c542]">
+          <span className="rounded-full bg-[#0f0f10] px-3 py-1 text-xs font-semibold text-[#f5f5f5]">
             3 treinos
           </span>
         </div>
-        <div className="mt-6 grid grid-cols-4 gap-3 text-center text-sm text-[#c9c9d2]">
+        <div className="mt-6 grid grid-cols-4 gap-3 text-center text-sm text-[#c9c9d2] sm:grid-cols-7">
           {['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((dia, index) => (
             <div
               key={`${dia}-${index}`}
-              className={`flex h-12 flex-col items-center justify-center rounded-2xl border border-[#2a2a31] ${
-                index % 3 === 0 ? 'bg-[#f4c542]/15 text-[#f4c542]' : ''
+              className={`flex h-12 flex-col items-center justify-center rounded-lg border border-[#2a2a31] ${
+                index % 3 === 0 ? 'bg-white/10 text-[#f5f5f5]' : ''
               }`}
             >
               <span className="text-xs font-semibold uppercase">{dia}</span>
@@ -117,12 +158,12 @@ export default function InicioPage() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid gap-4 md:grid-cols-3">
         {quickLinks.map((item) => (
           <Link
             key={item.id}
             href={item.href}
-            className="block rounded-3xl border border-white/5 bg-[#18181b] p-5 shadow-lg transition hover:border-[#f4c542]/40"
+            className="block rounded-lg border border-white/5 bg-[#18181b] p-5 shadow-lg transition hover:border-white/30"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -131,7 +172,7 @@ export default function InicioPage() {
                 </h3>
                 <p className="mt-1 text-sm text-[#c9c9d2]">{item.descricao}</p>
               </div>
-              <span className="text-[#f4c542] text-lg">→</span>
+              <span className="text-[#f5f5f5] text-lg">→</span>
             </div>
           </Link>
         ))}

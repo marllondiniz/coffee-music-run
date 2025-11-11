@@ -53,10 +53,25 @@ export default function LoginClient() {
       const supabase = getSupabaseClient()
 
       if (mode === 'signIn') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
         if (error) {
           throw error
+        }
+
+        const userId = data.user?.id
+        if (userId) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', userId)
+            .maybeSingle()
+
+          if (profile?.is_admin) {
+            setFeedback({ type: 'success', text: 'Bem-vindo(a), administrador!' })
+            router.push('/admin')
+            return
+          }
         }
 
         setFeedback({ type: 'success', text: 'Login realizado com sucesso!' })
@@ -64,13 +79,33 @@ export default function LoginClient() {
       }
 
       if (mode === 'signUp') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: origin ? `${origin}/testeapp` : undefined,
+          },
         })
-
+        
         if (error) {
           throw error
+        }
+
+        const userId = data.user?.id
+        const userEmail = data.user?.email ?? email
+
+        if (userId && userEmail) {
+          const response = await fetch('/api/auth/create-profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: userId, email: userEmail }),
+          })
+
+          if (!response.ok) {
+            console.error('Falha ao sincronizar perfil:', await response.text())
+          }
         }
 
         setFeedback({
@@ -121,7 +156,7 @@ export default function LoginClient() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 py-16 text-neutral-100">
-      <div className="grid w-full max-w-5xl gap-12 rounded-3xl border border-neutral-800 bg-neutral-900/70 p-10 shadow-xl backdrop-blur">
+      <div className="grid w-full max-w-5xl gap-12 rounded-lg border border-neutral-800 bg-neutral-900/70 p-10 shadow-xl backdrop-blur">
         <div className="flex flex-col items-center gap-4 text-center">
           <Image src="/coffe-music.png" alt="Coffee Music & Run" width={240} height={240} />
           <div>
@@ -140,7 +175,7 @@ export default function LoginClient() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3 text-base text-neutral-100 outline-none transition focus:border-amber-400 focus:ring focus:ring-amber-400/20"
+              className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3 text-base text-neutral-100 outline-none transition focus:border-white/60 focus:ring focus:ring-white/20"
               placeholder="seu@email.com"
               required
             />
@@ -153,7 +188,7 @@ export default function LoginClient() {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3 text-base text-neutral-100 outline-none transition focus:border-amber-400 focus:ring focus:ring-amber-400/20"
+                className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3 text-base text-neutral-100 outline-none transition focus:border-white/60 focus:ring focus:ring-white/20"
                 placeholder="Mínimo 6 caracteres"
                 required
                 minLength={6}
@@ -168,7 +203,7 @@ export default function LoginClient() {
                 type="password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3 text-base text-neutral-100 outline-none transition focus:border-amber-400 focus:ring focus:ring-amber-400/20"
+                className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3 text-base text-neutral-100 outline-none transition focus:border-white/60 focus:ring focus:ring-white/20"
                 placeholder="Repita sua senha"
                 required
                 minLength={6}
@@ -191,7 +226,7 @@ export default function LoginClient() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-3 text-base font-semibold text-neutral-900 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
+            className="flex items-center justify-center gap-2 rounded-lg bg-[#f5f5f5] px-4 py-3 text-base font-semibold text-[#0f0f10] transition hover:bg-white/80 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
           >
             {loading ? 'Aguarde...' : primaryActionLabel}
           </button>
@@ -201,7 +236,7 @@ export default function LoginClient() {
               <button
                 type="button"
                 onClick={() => handleModeChange('signIn')}
-                className="transition hover:text-amber-300"
+                className="transition hover:text-white"
               >
                 Já tenho conta
               </button>
@@ -210,7 +245,7 @@ export default function LoginClient() {
               <button
                 type="button"
                 onClick={() => handleModeChange('signUp')}
-                className="transition hover:text-amber-300"
+                className="transition hover:text-white"
               >
                 Criar conta
               </button>
@@ -219,7 +254,7 @@ export default function LoginClient() {
               <button
                 type="button"
                 onClick={() => handleModeChange('reset')}
-                className="transition hover:text-amber-300"
+                className="transition hover:text-white"
               >
                 Esqueci minha senha
               </button>

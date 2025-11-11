@@ -1,0 +1,91 @@
+import { NextResponse } from 'next/server'
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  if (searchParams.get('list') === '1') {
+    const supabaseAdmin = getSupabaseAdmin()
+    const { data, error } = await supabaseAdmin
+      .from('articles')
+      .select('*')
+      .order('publicado_em', { ascending: false })
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ data })
+  }
+
+  return NextResponse.json({ ok: true })
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const supabaseAdmin = getSupabaseAdmin()
+    const { data, error } = await supabaseAdmin.from('articles').insert(body).select('*').single()
+
+    if (error) {
+      console.error('Erro ao criar artigo:', error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    return NextResponse.json({ success: true, data })
+  } catch (error) {
+    console.error('Erro inesperado ao criar artigo:', error)
+    const message = error instanceof Error ? error.message : 'Erro inesperado.'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json()
+    const { id, ...rest } = body
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID do artigo é obrigatório.' }, { status: 400 })
+    }
+
+    const supabaseAdmin = getSupabaseAdmin()
+    const { error } = await supabaseAdmin.from('articles').update(rest).eq('id', id)
+
+    if (error) {
+      console.error('Erro ao atualizar artigo:', error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Erro inesperado ao atualizar artigo:', error)
+    const message = error instanceof Error ? error.message : 'Erro inesperado.'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID do artigo é obrigatório.' }, { status: 400 })
+    }
+
+    const supabaseAdmin = getSupabaseAdmin()
+    const { error } = await supabaseAdmin.from('articles').delete().eq('id', id)
+
+    if (error) {
+      console.error('Erro ao excluir artigo:', error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Erro inesperado ao excluir artigo:', error)
+    const message = error instanceof Error ? error.message : 'Erro inesperado.'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+}
+

@@ -1,8 +1,13 @@
-'use client'
-
 import Link from 'next/link'
+import { getEvents } from '@/lib/queries'
 
-const destaqueCards = [
+const destaqueCards: Array<{
+  id: string
+  titulo: string
+  descricao: string
+  icone: string
+  href?: string
+}> = [
   {
     id: 'historias',
     titulo: 'Histórias da comunidade',
@@ -29,9 +34,12 @@ const destaqueCards = [
     icone: '📚',
     href: '/blog',
   },
-]
+] ;
 
-export default function ClubePage() {
+export default async function ClubePage() {
+  const eventos = await getEvents()
+  const proximoEvento = eventos[0]
+
   return (
     <section className="space-y-6">
       <header className="space-y-4 text-center">
@@ -47,7 +55,7 @@ export default function ClubePage() {
         </p>
       </header>
 
-      <div className="space-y-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {destaqueCards.map((card) => {
           const InnerContent = (
             <div className="flex items-start gap-4">
@@ -60,7 +68,7 @@ export default function ClubePage() {
                 </h3>
                 <p className="mt-1 text-sm text-[#c9c9d2]">{card.descricao}</p>
                 {card.href && (
-                  <span className="mt-3 inline-flex items-center text-xs font-semibold uppercase tracking-wider text-[#f4c542]">
+                  <span className="mt-3 inline-flex items-center text-xs font-semibold uppercase tracking-wider text-[#f5f5f5]">
                     Acessar
                   </span>
                 )}
@@ -69,7 +77,7 @@ export default function ClubePage() {
           )
 
           const baseClass =
-            'block rounded-3xl border border-[#1f1f23] bg-[#18181b] p-5 shadow-lg transition-transform hover:border-[#f4c542]/50'
+            'block rounded-lg border border-[#1f1f23] bg-[#18181b] p-5 shadow-lg transition-transform hover:border-white/30'
 
           return card.href ? (
             <Link
@@ -87,18 +95,26 @@ export default function ClubePage() {
         })}
       </div>
 
-      <div className="space-y-4 rounded-3xl border border-[#f4c542]/40 bg-gradient-to-b from-[#f5d36b] to-[#f4c542] p-6 text-center text-[#0f0f10] shadow-xl">
-        <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#4a3a12]">
+      <div className="space-y-4 rounded-lg border border-white/20 bg-gradient-to-b from-[#f5f5f5] to-[#dcdcdc] p-6 text-center text-[#0f0f10] shadow-xl">
+        <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#2f2f2f]">
           Em breve
         </span>
         <h3 className="text-xl font-black uppercase tracking-tight">RITMO CERTO PREMIUM</h3>
-        <p className="text-sm font-medium text-[#3a2f0f]">
-          Mentorias, experiências imersivas e benefícios VIP para quem quer viver o movimento ao
-          máximo.
+        <p className="text-sm font-medium text-[#2f2f2f]">
+          {proximoEvento
+            ? `Próximo encontro: ${proximoEvento.titulo} • ${new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+                .format(new Date(proximoEvento.data_horario))
+                .replace('.', '')} • ${proximoEvento.local_nome}`
+            : 'Mentorias, experiências imersivas e benefícios VIP para quem quer viver o movimento ao máximo.'}
         </p>
         <button
           type="button"
-          className="mx-auto mt-4 inline-flex items-center justify-center rounded-full bg-[#0f0f10] px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[#f4c542] transition hover:brightness-110"
+          className="mx-auto mt-4 inline-flex items-center justify-center rounded-full bg-[#0f0f10] px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[#f5f5f5] transition hover:brightness-110"
         >
           Quero saber quando lançar
         </button>

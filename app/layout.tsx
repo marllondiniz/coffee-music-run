@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Orbitron, Space_Grotesk } from 'next/font/google'
+import { Orbitron } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import { EVENT_NAME, EVENT_DATE, EVENT_TIME, EVENT_LOCATION_NAME } from '@/lib/constants'
 import { CookieConsent } from './(components)/CookieConsent'
@@ -10,10 +11,16 @@ const orbitron = Orbitron({
   weight: ['400', '700', '900'],
 })
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-space',
-  weight: ['400', '700'],
+const geist = localFont({
+  src: [
+    {
+      path: '../public/Geist-VariableFont_wght.ttf',
+      weight: '100 900',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-geist',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -105,7 +112,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${orbitron.variable} ${spaceGrotesk.variable} font-space antialiased`}>
+      <body className={`${orbitron.variable} ${geist.variable} font-space antialiased`}>
         {children}
         <CookieConsent />
         {/* Analytics placeholder */}
