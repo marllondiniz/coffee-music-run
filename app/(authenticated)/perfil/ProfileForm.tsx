@@ -1,16 +1,29 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition, FormEvent } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  FormEvent,
+  ChangeEvent,
+} from 'react'
 import { UploadCloud, Check, AlertCircle } from 'lucide-react'
-import type { ProfileRecord } from '@/lib/queries'
+import type { ProfileRecord } from '@/lib/profile'
 import { getSupabaseClient } from '@/lib/supabaseClient'
+import { useRouter } from 'next/navigation'
 
 type ProfileFormProps = {
   profile: ProfileRecord | null
   email: string | null
+  onProfileUpdated?: (profile: ProfileRecord) => void
 }
 
-export function ProfileForm({ profile, email }: ProfileFormProps) {
+const AVATAR_BUCKET = 'avatars'
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024 // 2MB
+
+export function ProfileForm({ profile, email, onProfileUpdated }: ProfileFormProps) {
+  const router = useRouter()
   const [receberBeneficios, setReceberBeneficios] = useState(
     profile?.recebe_beneficios ?? true
   )
@@ -19,15 +32,45 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
   )
   const [isPending, startTransition] = useTransition()
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const supabase = getSupabaseClient()
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null)
 
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
+
+      if (localPreviewUrl) {
+        URL.revokeObjectURL(localPreviewUrl)
+      }
     }
-  }, [])
+  }, [localPreviewUrl])
+
+  useEffect(() => {
+    if (avatarFile) {
+      return
+    }
+
+    if (profile?.avatar_url) {
+      if (profile.avatar_url.startsWith('http')) {
+        setAvatarPreview(profile.avatar_url)
+        setLocalPreviewUrl(null)
+        return
+      }
+
+      const { data } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(profile.avatar_url)
+      if (data?.publicUrl) {
+        setAvatarPreview(data.publicUrl)
+        setLocalPreviewUrl(null)
+      }
+    } else {
+      setAvatarPreview(null)
+    }
+  }, [avatarFile, profile?.avatar_url, supabase])
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -36,9 +79,11 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
     const payload = {
       nome: String(formData.get('nome') || ''),
       bio: String(formData.get('bio') || ''),
+      telefone: String(formData.get('telefone') || ''),
       esporte_favorito: String(formData.get('esporte_favorito') || ''),
       frequencia_semanal: String(formData.get('frequencia_semanal') || ''),
       recebe_beneficios: receberBeneficios,
+      is_complete: true,
     }
 
     startTransition(async () => {
@@ -52,9 +97,54 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
         return
       }
 
+      let avatarPath = profile?.avatar_url ?? null
+
+      if (avatarFile) {
+        const fileExtension = avatarFile.name.split('.').pop()?.toLowerCase() || 'png'
+        const filePath = `${user.id}/${crypto.randomUUID()}.${fileExtension}`
+
+        const { error: uploadError } = await supabase.storage
+          .from(AVATAR_BUCKET)
+          .upload(filePath, avatarFile, {
+            cacheControl: '3600',
+            upsert: true,
+            contentType: avatarFile.type,
+          })
+
+        if (uploadError) {
+          console.error('Erro ao enviar avatar:', uploadError)
+          setFeedback({
+            type: 'error',
+            message: 'Não foi possível enviar sua foto. Tente novamente.',
+          })
+          return
+        }
+
+        if (avatarPath && !avatarPath.startsWith('http')) {
+          await supabase.storage.from(AVATAR_BUCKET).remove([avatarPath])
+        }
+
+        avatarPath = filePath
+        const { data } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(filePath)
+        if (data?.publicUrl) {
+          setAvatarPreview(data.publicUrl)
+        }
+        setLocalPreviewUrl(null)
+        setAvatarFile(null)
+      }
+
+      const updatedProfile: ProfileRecord = {
+        id: user.id,
+        email: email ?? profile?.email ?? null,
+        ...payload,
+        avatar_url: avatarPath,
+        is_complete: true,
+      }
+
       const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         ...payload,
+        avatar_url: avatarPath,
         updated_at: new Date().toISOString(),
       })
 
@@ -65,12 +155,49 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
       }
 
       setFeedback({ type: 'success', message: 'Perfil atualizado com sucesso!' })
+      onProfileUpdated?.(updatedProfile)
 
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
       timeoutRef.current = setTimeout(() => setFeedback(null), 3000)
+
+      router.push('/inicio')
     })
+  }
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) {
+      return
+    }
+
+    if (file.size > MAX_AVATAR_SIZE) {
+      setFeedback({
+        type: 'error',
+        message: 'Arquivo maior que 2MB. Escolha uma imagem menor.',
+      })
+      event.target.value = ''
+      return
+    }
+
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      setFeedback({
+        type: 'error',
+        message: 'Formato inválido. Use uma imagem JPEG ou PNG.',
+      })
+      event.target.value = ''
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(file)
+    setAvatarFile(file)
+    setAvatarPreview(objectUrl)
+    setLocalPreviewUrl(objectUrl)
   }
 
   const feedbackNode = feedback
@@ -95,22 +222,37 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
+      encType="multipart/form-data"
       className="space-y-6 rounded-lg border border-white/5 bg-[#18181b] p-6 shadow-xl"
     >
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-dashed border-white/30 bg-[#0f0f10]">
-          <UploadCloud className="h-8 w-8 text-[#f5f5f5]" />
-          <button
-            type="button"
-            className="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full bg-[#f5f5f5] text-[#0f0f10]"
-          >
-            <UploadCloud className="h-5 w-5" />
-          </button>
-        </div>
-        <span className="text-xs text-[#9a9aa2]">
+      <div className="flex flex-col items-center gap-3">
+        <button
+          type="button"
+          onClick={handleAvatarClick}
+          className="group relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-[#1f1f22] via-[#111114] to-[#050506] shadow-2xl transition hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-[#f5f5f5]/30"
+        >
+          {avatarPreview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarPreview}
+              alt="Foto do perfil"
+              className="h-full w-full object-cover transition duration-300 group-hover:scale-105 group-focus:scale-105"
+            />
+          ) : (
+            <UploadCloud className="h-9 w-9 text-[#f5f5f5]" />
+          )}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg"
+          className="sr-only"
+          onChange={handleFileChange}
+        />
+        <span className="text-xs text-[#b5b5bd]">
           Envie uma foto em JPEG ou PNG (máx. 2MB)
         </span>
-        {email && <span className="text-xs text-[#6e6e75]">Logado como {email}</span>}
+        {email && <span className="text-xs text-[#7c7c84]">Logado como {email}</span>}
       </div>
 
       <div className="grid gap-4 text-left md:grid-cols-2">
@@ -121,6 +263,17 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
             defaultValue={profile?.nome ?? ''}
             type="text"
             placeholder="Seu nome"
+            className="w-full rounded-2xl border border-[#2a2a31] bg-[#0f0f10] px-4 py-3 text-sm text-[#f5f5f5] placeholder:text-[#54545b] focus:border-white/40 focus:outline-none"
+          />
+        </label>
+
+        <label className="space-y-2">
+          <span className="text-sm font-semibold uppercase text-[#f5f5f5]">Telefone</span>
+          <input
+            name="telefone"
+            defaultValue={profile?.telefone ?? ''}
+            type="tel"
+            placeholder="(00) 00000-0000"
             className="w-full rounded-2xl border border-[#2a2a31] bg-[#0f0f10] px-4 py-3 text-sm text-[#f5f5f5] placeholder:text-[#54545b] focus:border-white/40 focus:outline-none"
           />
         </label>

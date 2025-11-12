@@ -17,6 +17,7 @@ export async function POST(request: Request) {
       {
         id,
         email,
+        is_complete: false,
       },
       { onConflict: 'id' }
     )

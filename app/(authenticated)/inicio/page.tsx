@@ -2,12 +2,6 @@ import Link from 'next/link'
 import { getChallenges, getChallengeProgress, getEvents } from '@/lib/queries'
 import { getSupabaseServer } from '@/lib/supabaseServer'
 
-const quickLinks = [
-  { id: 'eventos', titulo: 'Eventos', descricao: 'Escolha sua próxima experiência.', href: '/eventos' },
-  { id: 'conteudo', titulo: 'Conteúdo', descricao: 'Dicas e treinos selecionados.', href: '/blog' },
-  { id: 'clube', titulo: 'Clube', descricao: 'Benefícios e histórias da comunidade.', href: '/clube' },
-]
-
 function formatEventHighlight(date: string | null, title?: string | null, local?: string | null) {
   if (!date) return title ?? 'Evento em breve'
   const formatter = new Intl.DateTimeFormat('pt-BR', {
@@ -61,6 +55,7 @@ export default async function InicioPage() {
           : 'Você ainda não acumulou pontos esta semana.',
       acao: 'Ver ranking',
       href: '/desafios',
+      tag: 'Em breve',
     },
     {
       id: 'desafio',
@@ -70,6 +65,7 @@ export default async function InicioPage() {
         : 'Novos desafios chegam toda semana.',
       acao: 'Ver desafios',
       href: '/desafios',
+      tag: 'Em breve',
     },
   ]
 
@@ -87,23 +83,36 @@ export default async function InicioPage() {
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {destaques.map((card) => (
           <div
             key={card.id}
-            className={`rounded-lg border border-white/5 p-5 shadow-lg transition ${
+            className={`flex h-full flex-col rounded-lg border border-white/5 p-5 shadow-lg transition ${
               card.emphasize
                 ? 'bg-gradient-to-r from-[#f5f5f5] to-[#dcdcdc] text-[#0f0f10]'
                 : 'bg-[#18181b] hover:border-white/30'
             }`}
           >
-            <h3
-              className={`text-base font-semibold uppercase tracking-wide ${
-                card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
-              }`}
-            >
-              {card.titulo}
-            </h3>
+            <div className="flex items-start justify-between gap-3">
+              <h3
+                className={`text-base font-semibold uppercase tracking-wide ${
+                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
+                }`}
+              >
+                {card.titulo}
+              </h3>
+              {card.tag && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                    card.emphasize
+                      ? 'bg-[#0f0f10] text-[#f5f5f5]'
+                      : 'border border-white/15 text-[#c9c9d2]'
+                  }`}
+                >
+                  {card.tag}
+                </span>
+              )}
+            </div>
             <p
               className={
                 card.emphasize ? 'mt-2 text-sm text-[#2c240d]' : 'mt-2 text-sm text-[#c9c9d2]'
@@ -114,7 +123,7 @@ export default async function InicioPage() {
             {card.href ? (
               <Link
                 href={card.href}
-                className={`mt-4 inline-flex items-center text-xs font-semibold uppercase tracking-wider ${
+                className={`mt-auto inline-flex text-xs font-semibold uppercase tracking-wider ${
                   card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
                 }`}
               >
@@ -122,7 +131,7 @@ export default async function InicioPage() {
               </Link>
             ) : (
               <span
-                className={`mt-4 inline-flex text-xs font-semibold uppercase tracking-wider ${
+                className={`mt-auto inline-flex text-xs font-semibold uppercase tracking-wider ${
                   card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
                 }`}
               >
@@ -158,25 +167,6 @@ export default async function InicioPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        {quickLinks.map((item) => (
-          <Link
-            key={item.id}
-            href={item.href}
-            className="block rounded-lg border border-white/5 bg-[#18181b] p-5 shadow-lg transition hover:border-white/30"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-semibold uppercase tracking-wide text-[#f5f5f5]">
-                  {item.titulo}
-                </h3>
-                <p className="mt-1 text-sm text-[#c9c9d2]">{item.descricao}</p>
-              </div>
-              <span className="text-[#f5f5f5] text-lg">→</span>
-            </div>
-          </Link>
-        ))}
-      </div>
     </section>
   )
 }

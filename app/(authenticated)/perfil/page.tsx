@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { ProfileRecord } from '@/lib/queries'
+import type { ProfileRecord } from '@/lib/profile'
 import { getSupabaseClient } from '@/lib/supabaseClient'
 import { ProfileForm } from './ProfileForm'
 
@@ -64,7 +64,11 @@ export default function PerfilPage() {
         </p>
       </header>
 
-      <ProfileForm profile={profile} email={email} />
+      <ProfileForm
+        profile={profile}
+        email={email}
+        onProfileUpdated={(updatedProfile) => setProfile(updatedProfile)}
+      />
     </section>
   )
 }

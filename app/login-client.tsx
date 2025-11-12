@@ -63,7 +63,7 @@ export default function LoginClient() {
         if (userId) {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('is_admin')
+            .select('is_admin, is_complete')
             .eq('id', userId)
             .maybeSingle()
 
@@ -72,6 +72,16 @@ export default function LoginClient() {
             router.push('/admin')
             return
           }
+
+          if (profile?.is_complete === false) {
+            setFeedback({ type: 'success', text: 'Complete seu perfil para continuar.' })
+            router.push('/perfil')
+            return
+          }
+
+          setFeedback({ type: 'success', text: 'Login realizado com sucesso!' })
+          router.push('/inicio')
+          return
         }
 
         setFeedback({ type: 'success', text: 'Login realizado com sucesso!' })

@@ -1,4 +1,5 @@
 import { getSupabaseServer } from './supabaseServer'
+import type { ProfileRecord } from './profile'
 
 export type EventRecord = {
   id: string
@@ -10,7 +11,20 @@ export type EventRecord = {
   preco: number | null
   gratuito: boolean | null
   participantes_confirmados: number | null
+  capacidade_maxima: number | null
   destaque: boolean | null
+  banner_id?: string | null
+}
+
+export type EventBannerRecord = {
+  id: string
+  titulo: string | null
+  subtitulo: string | null
+  event_id: string | null
+  image_url: string
+  image_path: string
+  is_active: boolean | null
+  created_at: string
 }
 
 export type ArticleRecord = {
@@ -37,17 +51,6 @@ export type ChallengeProgressRecord = {
   progresso: number | null
 }
 
-export type ProfileRecord = {
-  id: string
-  email: string | null
-  nome: string | null
-  bio: string | null
-  esporte_favorito: string | null
-  frequencia_semanal: string | null
-  recebe_beneficios: boolean | null
-  avatar_url: string | null
-}
-
 export async function getEvents(): Promise<EventRecord[]> {
   const supabase = getSupabaseServer()
   const { data, error } = await supabase
@@ -57,6 +60,37 @@ export async function getEvents(): Promise<EventRecord[]> {
 
   if (error) {
     console.error('Erro ao buscar eventos:', error)
+    return []
+  }
+
+  return data ?? []
+}
+
+export async function getActiveEventBanners(): Promise<EventBannerRecord[]> {
+  const supabase = getSupabaseServer()
+  const { data, error } = await supabase
+    .from('event_banners')
+    .select('*')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Erro ao buscar banners ativos:', error)
+    return []
+  }
+
+  return data ?? []
+}
+
+export async function getEventBanners(): Promise<EventBannerRecord[]> {
+  const supabase = getSupabaseServer()
+  const { data, error } = await supabase
+    .from('event_banners')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Erro ao listar banners:', error)
     return []
   }
 
