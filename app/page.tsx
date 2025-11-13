@@ -46,16 +46,6 @@ export default function Home() {
           <p className="text-lg md:text-xl text-neutral-400 font-space max-w-lg mx-auto">
             Estamos ajustando algumas coisas.<br />Volte mais tarde.
           </p>
-
-          {/* Botão de acesso ao app */}
-          <div className="pt-8">
-            <a
-              href="/testeapp"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-neutral-950 font-orbitron font-bold uppercase hover:bg-neutral-100 transition-all"
-            >
-              Acessar área exclusiva →
-            </a>
-          </div>
         </div>
       </div>
 
