@@ -11,7 +11,7 @@ import { Newsletter } from '../(components)/Newsletter'
 import { CTA } from '../(components)/CTA'
 import { Footer } from '../(components)/Footer'
 
-export default function BrizzPage() {
+export default function TestePage() {
   return (
     <main className="min-h-screen">
       <Header />

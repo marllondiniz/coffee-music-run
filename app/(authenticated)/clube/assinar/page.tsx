@@ -13,8 +13,13 @@ export default function AssinarPage() {
       </header>
 
       <div className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-white/10 bg-[#18181b] p-6 shadow-xl md:p-8">
-        <div className="space-y-3">
+        <div className="flex items-center justify-between">
           <h3 className="text-2xl font-bold text-[#f5f5f5]">Benefícios do Clube</h3>
+          <span className="inline-flex items-center rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-200">
+            Em breve
+          </span>
+        </div>
+        <div className="space-y-3">
           <ul className="space-y-3 text-sm text-[#c9c9d2]">
             <li className="flex items-start gap-3">
               <span className="text-lg">🎟️</span>
@@ -81,9 +86,10 @@ export default function AssinarPage() {
 
         <button
           type="button"
-          className="w-full rounded-full bg-[#f5f5f5] px-6 py-4 text-sm font-bold uppercase tracking-wide text-[#0f0f10] shadow-lg transition hover:scale-[1.02] hover:brightness-95"
+          disabled
+          className="w-full rounded-full border border-white/10 bg-[#0f0f10] px-6 py-4 text-sm font-bold uppercase tracking-wide text-[#f5f5f5] opacity-60 shadow-lg"
         >
-          Assinar agora
+          Em breve
         </button>
 
         <p className="text-center text-xs text-[#73737c]">

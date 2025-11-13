@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Coffee Music & Run — Edição BRIZZ',
     description:
       'Feche o ano no ritmo certo: corrida leve, música, café especial e comunidade. Edição BRIZZ — 13 de dezembro, 6h30.',
-    url: 'https://ritmocertoclub.com.br/brizz',
+    url: 'https://ritmocertoclub.com.br/teste',
     type: 'website',
     siteName: 'Coffee Music & Run',
     images: [
@@ -31,5 +31,5 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  redirect('/brizz')
+  redirect('/teste')
 }
