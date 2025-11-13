@@ -129,7 +129,7 @@ export default function LoginClient() {
 
       if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: origin ? `${origin}/inicio` : undefined,
+          redirectTo: origin ? `${origin}/reset-senha` : undefined,
         })
 
         if (error) {
@@ -185,6 +185,10 @@ export default function LoginClient() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              onInvalid={(event) =>
+                event.currentTarget.setCustomValidity('Informe um endereço de e-mail válido.')
+              }
+              onInput={(event) => event.currentTarget.setCustomValidity('')}
               className="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-3 text-base text-neutral-100 outline-none transition focus:border-white/60 focus:ring focus:ring-white/20"
               placeholder="seu@email.com"
               required

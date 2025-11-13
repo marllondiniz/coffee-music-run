@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useTransition } from 'react'
+import Link from 'next/link'
 import type { EventBannerRecord, EventRecord } from '@/lib/queries'
 import { getSupabaseClient } from '@/lib/supabaseClient'
 import { useUserRole } from '@/lib/useUserRole'
@@ -17,6 +18,50 @@ type RegistrationMeta = {
 type MessageState = {
   type: 'success' | 'error'
   text: string
+}
+
+type DescriptionSection = {
+  titulo: string | null
+  conteudo: string
+}
+
+const parseDescriptionSections = (raw: string | null): DescriptionSection[] => {
+  if (!raw) return []
+
+  try {
+    const parsed = JSON.parse(raw) as { sections?: Array<{ titulo?: string | null; conteudo?: string | null }> }
+    if (parsed && Array.isArray(parsed.sections)) {
+      return parsed.sections
+        .map((section) => ({
+          titulo: section.titulo ?? null,
+          conteudo: section.conteudo ?? '',
+        }))
+        .filter((section) => section.conteudo.trim().length > 0)
+    }
+  } catch (error) {
+    // Conteúdo não está no formato JSON estruturado
+  }
+
+  if (raw.includes('---')) {
+    return raw
+      .split(/^-{3,}$|---+/gm)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((conteudo) => ({ titulo: null, conteudo }))
+  }
+
+  const trimmed = raw.trim()
+  if (!trimmed) return []
+
+  return [{ titulo: null, conteudo: trimmed }]
+}
+
+const getShortDescription = (raw: string | null, limit = 220) => {
+  const sections = parseDescriptionSections(raw)
+  const first = sections[0]?.conteudo ?? ''
+  const normalized = first.replace(/\s+/g, ' ').trim()
+  if (!normalized) return 'Detalhes em breve.'
+  return normalized.length > limit ? `${normalized.slice(0, limit)}…` : normalized
 }
 
 export function EventList({ events, activeBanners = [] }: EventListProps) {
@@ -77,6 +122,32 @@ export function EventList({ events, activeBanners = [] }: EventListProps) {
 
     return () => {
       isMounted = false
+    }
+  }, [supabase])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('events-progress')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'events' }, (payload) => {
+        const updated = payload.new as EventRecord
+        setEventStates((prev) =>
+          prev.map((item) =>
+            item.id === updated.id
+              ? {
+                  ...item,
+                  participantes_confirmados: updated.participantes_confirmados ?? item.participantes_confirmados ?? 0,
+                  capacidade_maxima: updated.capacidade_maxima ?? item.capacidade_maxima ?? 0,
+                  preco: updated.preco ?? item.preco,
+                  gratuito: updated.gratuito ?? item.gratuito,
+                }
+              : item
+          )
+        )
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
     }
   }, [supabase])
 
@@ -147,35 +218,32 @@ export function EventList({ events, activeBanners = [] }: EventListProps) {
         return
       }
 
-      const { data: updatedEvent, error: updateError } = await supabase
+      const { data: updatedEventData, error: updateError } = await supabase
         .from('events')
         .update({
           participantes_confirmados: confirmados + 1,
         })
         .eq('id', eventId)
         .select('participantes_confirmados')
-        .single()
+
+      const updatedEvent = updatedEventData?.[0]
 
       if (updateError) {
         console.error('Erro ao atualizar contagem de participantes:', updateError)
-        setMessages((prev) => ({
-          ...prev,
-          [eventId]: {
-            type: 'error',
-            text: 'Sua inscrição foi registrada, mas não foi possível atualizar o progresso.',
-          },
-        }))
-      } else {
+      }
+
+      // Atualizar o estado local sempre (mesmo se houver erro no update)
         setEventStates((prev) =>
           prev.map((item) =>
             item.id === eventId
               ? {
                   ...item,
-                  participantes_confirmados: updatedEvent.participantes_confirmados ?? confirmados + 1,
+                participantes_confirmados: updatedEvent?.participantes_confirmados ?? confirmados + 1,
                 }
               : item
           )
         )
+
         setMessages((prev) => ({
           ...prev,
           [eventId]: {
@@ -183,7 +251,6 @@ export function EventList({ events, activeBanners = [] }: EventListProps) {
             text: 'Participação confirmada com sucesso!',
           },
         }))
-      }
 
       setRegistrations((prev) => ({
         ...prev,
@@ -257,6 +324,7 @@ export function EventList({ events, activeBanners = [] }: EventListProps) {
           const isProcessing = isPending && activeEventId === event.id
           const eventBanner = activeBanners.find(banner => banner.event_id === event.id)
           const hasBanner = Boolean(eventBanner)
+        const shortDescription = getShortDescription(event.descricao)
 
           return (
             <article
@@ -295,9 +363,11 @@ export function EventList({ events, activeBanners = [] }: EventListProps) {
                       <span className="inline-flex items-center rounded-full bg-[#2a2a31] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#9a9aa2]">
                         Evento
                       </span>
-                      <h3 className="mt-3 text-xl font-bold tracking-tight text-[#f5f5f5]">
+                      <Link href={`/eventos/${event.id}`}>
+                        <h3 className="mt-3 text-xl font-bold tracking-tight text-[#f5f5f5] transition hover:text-[#e2e2e2]">
                         {event.titulo}
                       </h3>
+                      </Link>
                     </div>
                     <div className="text-right text-sm text-[#c9c9d2]">
                       <p>{new Date(event.data_horario).toLocaleDateString('pt-BR')}</p>
@@ -309,7 +379,7 @@ export function EventList({ events, activeBanners = [] }: EventListProps) {
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm text-[#d6d6de]">{event.descricao ?? 'Detalhes em breve.'}</p>
+                <p className="text-sm text-[#d6d6de]">{shortDescription}</p>
                 </header>
 
                 <div className="space-y-3 text-sm text-[#d6d6de]">
@@ -420,6 +490,13 @@ export function EventList({ events, activeBanners = [] }: EventListProps) {
                     </button>
                   )}
                 </div>
+
+                <Link
+                  href={`/eventos/${event.id}`}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-white/10 bg-[#18181b] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-[#f5f5f5] transition hover:border-white/20 hover:bg-[#1f1f25]"
+                >
+                  Saiba mais
+                </Link>
               </div>
               </div>
             </article>

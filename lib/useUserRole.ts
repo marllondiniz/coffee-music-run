@@ -52,6 +52,11 @@ export function useUserRole() {
           }
         : null
 
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log('Perfil carregado (useUserRole)', normalizedProfile)
+      }
+
       setProfile(normalizedProfile)
       setRole(getUserRole(normalizedProfile))
       setLoading(false)

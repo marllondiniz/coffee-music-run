@@ -176,11 +176,11 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
             </div>
             <div className="flex flex-1 items-center justify-center">
               <Image
-                src="/coffe-music.png"
-                alt="Coffee Music & Run"
-                width={140}
-                height={40}
-                className="h-8 w-auto max-w-[144%] sm:max-w-full"
+                src="/logo-ritmo-certo.svg"
+                alt="Ritmo Certo Club"
+                width={220}
+                height={52}
+                className="h-10 w-auto max-w-[230%] sm:h-12 sm:max-w-none"
                 priority
               />
             </div>

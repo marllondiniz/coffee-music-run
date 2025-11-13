@@ -31,9 +31,9 @@ export default async function DesafiosPage() {
 
       <div className="space-y-3 rounded-lg border border-white/20 bg-gradient-to-br from-[#f5f5f5] to-[#dcdcdc] p-6 text-[#0f0f10] shadow-xl">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#2f2f2f]">
-            Total acumulado
-          </span>
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#2f2f2f]">
+          Total acumulado
+        </span>
           <span className="rounded-full bg-[#0f0f10]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#2f2f2f]">
             Em breve
           </span>
@@ -75,12 +75,12 @@ export default async function DesafiosPage() {
       </div>
 
       <div className="space-y-2">
-        <button
-          type="button"
-          className="w-full rounded-2xl bg-[#f5f5f5] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-[#0f0f10] transition hover:brightness-95"
-        >
-          Ver ranking da comunidade
-        </button>
+      <button
+        type="button"
+        className="w-full rounded-2xl bg-[#f5f5f5] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-[#0f0f10] transition hover:brightness-95"
+      >
+        Ver ranking da comunidade
+      </button>
         <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-[#9a9aa2]">
           Ranking completo disponível em breve
         </p>

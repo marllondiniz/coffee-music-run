@@ -128,6 +128,10 @@ export function Newsletter() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onInvalid={(event) =>
+                    event.currentTarget.setCustomValidity('Informe um endereço de e-mail válido.')
+                  }
+                  onInput={(event) => event.currentTarget.setCustomValidity('')}
                   placeholder="Seu melhor e-mail"
                   className="w-full px-6 py-4 md:py-5 bg-neutral-900/90 backdrop-blur-sm border border-white/10 rounded-xl text-neutral-100 placeholder-neutral-400 font-space text-base md:text-lg focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all duration-300"
                   disabled={isSubmitting}

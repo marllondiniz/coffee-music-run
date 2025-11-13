@@ -1,20 +1,27 @@
 'use client'
 
 import { FormEvent, useMemo, useState } from 'react'
-import type { EventRecord } from '@/lib/queries'
+import type { EventBannerRecord, EventRecord } from '@/lib/queries'
 import { getSupabaseClient } from '@/lib/supabaseClient'
 
 type Props = {
   initialEvents: EventRecord[]
 }
 
+type DescriptionSection = {
+  id: string
+  titulo: string
+  conteudo: string
+}
+
 type FormState = {
   titulo: string
-  descricao: string
+  descricaoSections: DescriptionSection[]
   data_horario: string
   local_nome: string
   local_detalhe: string
   preco: string
+  capacidade_maxima: string
   destaque: boolean
   bannerFile: File | null
   bannerPreview: string | null
@@ -22,19 +29,28 @@ type FormState = {
   bannerSubtitulo: string
 }
 
-const defaultForm: FormState = {
+const generateId = () => crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)
+
+const createEmptySection = (initialContent = ''): DescriptionSection => ({
+  id: generateId(),
   titulo: '',
-  descricao: '',
+  conteudo: initialContent,
+})
+
+const createDefaultForm = (): FormState => ({
+  titulo: '',
+  descricaoSections: [createEmptySection()],
   data_horario: '',
   local_nome: '',
   local_detalhe: '',
   preco: '',
+  capacidade_maxima: '',
   destaque: false,
   bannerFile: null,
   bannerPreview: null,
   bannerTitulo: '',
   bannerSubtitulo: '',
-}
+})
 
 const BANNER_BUCKET = 'event-banners'
 
@@ -78,12 +94,61 @@ const parseDateTime = (value: string): Date | null => {
   return null
 }
 
+const parseDescriptionSections = (raw: string | null): DescriptionSection[] => {
+  if (!raw) {
+    return [createEmptySection()]
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as { sections?: Array<{ titulo?: string | null; conteudo?: string | null }> }
+    if (parsed && Array.isArray(parsed.sections) && parsed.sections.length > 0) {
+      const mapped = parsed.sections
+        .map((section, index) => ({
+          id: generateId(),
+          titulo: section.titulo ?? '',
+          conteudo: section.conteudo ?? '',
+          order: index,
+        }))
+        .filter((section) => section.conteudo.trim().length > 0)
+        .map(({ order, ...rest }) => rest)
+
+      if (mapped.length > 0) {
+        return mapped
+      }
+    }
+  } catch (error) {
+    // Ignora: conteúdo não está em JSON estruturado
+  }
+
+  // Tentativa de separar por delimitadores manuais (---)
+  if (raw.includes('---')) {
+    const parts = raw.split(/^-{3,}$|---+/gm).map((part) => part.trim()).filter(Boolean)
+    if (parts.length > 0) {
+      return parts.map((conteudo) => createEmptySection(conteudo))
+    }
+  }
+
+  // Fallback: um único bloco com o texto inteiro
+  return [createEmptySection(raw)]
+}
+
+const getDescriptionPreview = (raw: string | null, limit = 160) => {
+  const sections = parseDescriptionSections(raw)
+  const firstContent = sections[0]?.conteudo ?? ''
+  const normalized = firstContent.replace(/\s+/g, ' ').trim()
+  if (!normalized) {
+    return ''
+  }
+  return normalized.length > limit ? `${normalized.slice(0, limit)}…` : normalized
+}
+
 export function EventAdminPanel({ initialEvents }: Props) {
   const [events, setEvents] = useState(initialEvents)
-  const [form, setForm] = useState<FormState>(defaultForm)
+  const [form, setForm] = useState<FormState>(() => createDefaultForm())
   const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingBanner, setEditingBanner] = useState<EventBannerRecord | null>(null)
   const supabase = useMemo(() => getSupabaseClient(), [])
 
   const handleChange = (field: keyof FormState, value: string | boolean) => {
@@ -92,23 +157,70 @@ export function EventAdminPanel({ initialEvents }: Props) {
 
   const handleBannerFileChange = (file: File | null) => {
     if (!file) {
-      setForm((prev) => ({ ...prev, bannerFile: null, bannerPreview: null }))
+      setForm((prev) => ({
+        ...prev,
+        bannerFile: null,
+        bannerPreview: editingBanner?.image_url ?? null,
+      }))
+      console.log('🗑️ Banner removido')
       return
     }
 
+    console.log('📁 Arquivo selecionado:', {
+      name: file.name,
+      type: file.type,
+      size: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+    })
+
     const isValidType = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)
     if (!isValidType) {
+      console.error('❌ Formato inválido:', file.type)
       setFeedback('Formato de imagem inválido. Use PNG, JPG ou WEBP.')
       return
     }
 
     if (file.size > 2 * 1024 * 1024) {
+      console.error('❌ Arquivo muito grande:', `${(file.size / 1024 / 1024).toFixed(2)}MB`)
       setFeedback('Imagem muito grande. Máximo 2MB.')
       return
     }
 
     const preview = URL.createObjectURL(file)
+    console.log('✅ Arquivo válido, criando preview:', preview)
     setForm((prev) => ({ ...prev, bannerFile: file, bannerPreview: preview }))
+    setFeedback('✅ Banner selecionado! Salve o evento para aplicar.')
+  }
+
+  const handleSectionChange = (
+    sectionId: string,
+    field: 'titulo' | 'conteudo',
+    value: string
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      descricaoSections: prev.descricaoSections.map((section) =>
+        section.id === sectionId ? { ...section, [field]: value } : section
+      ),
+    }))
+  }
+
+  const handleAddSection = () => {
+    setForm((prev) => ({
+      ...prev,
+      descricaoSections: [...prev.descricaoSections, createEmptySection()],
+    }))
+  }
+
+  const handleRemoveSection = (sectionId: string) => {
+    setForm((prev) => {
+      if (prev.descricaoSections.length === 1) {
+        return prev
+      }
+      return {
+        ...prev,
+        descricaoSections: prev.descricaoSections.filter((section) => section.id !== sectionId),
+      }
+    })
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -124,13 +236,32 @@ export function EventAdminPanel({ initialEvents }: Props) {
       return
     }
 
+    const capacidadeNumero = form.capacidade_maxima
+      ? Number.parseInt(form.capacidade_maxima, 10)
+      : null
+
+    const normalizedSections = form.descricaoSections
+      .map((section) => ({
+        titulo: section.titulo.trim(),
+        conteudo: section.conteudo.trim(),
+      }))
+      .filter((section) => section.conteudo.length > 0)
+      .map((section) => ({
+        titulo: section.titulo.length > 0 ? section.titulo : null,
+        conteudo: section.conteudo,
+      }))
+
+    const descricaoPayload =
+      normalizedSections.length > 0 ? JSON.stringify({ sections: normalizedSections }) : null
+
     const payload = {
       titulo: form.titulo,
-      descricao: form.descricao || null,
+      descricao: descricaoPayload,
       data_horario: parsedDate.toISOString(),
       local_nome: form.local_nome,
       local_detalhe: form.local_detalhe || null,
       preco: form.preco ? Number(form.preco.replace(',', '.')) : 0,
+      capacidade_maxima: capacidadeNumero && !Number.isNaN(capacidadeNumero) ? capacidadeNumero : null,
       destaque: form.destaque,
     }
 
@@ -151,72 +282,115 @@ export function EventAdminPanel({ initialEvents }: Props) {
     const result = await response.json().catch(() => null)
     const updatedEvent = result?.data ?? null
 
+    const eventId = updatedEvent?.id ?? editingId
+
+    console.log('🔍 Diagnóstico upload de banner:', {
+      isEditing,
+      eventId,
+      updatedEvent,
+      hasBannerFile: !!form.bannerFile,
+      fileName: form.bannerFile?.name,
+    })
+
+    const refreshEvents = async () => {
+      const refresh = await fetch('/api/admin/events?list=1')
+      if (refresh.ok) {
+        const { data } = await refresh.json()
+        setEvents(data ?? [])
+      }
+    }
+
     if (isEditing) {
       setFeedback('Evento atualizado com sucesso!')
       if (updatedEvent) {
         setEvents((prev) => prev.map((evento) => (evento.id === updatedEvent.id ? updatedEvent : evento)))
       } else {
-        const refresh = await fetch('/api/admin/events?list=1')
-        if (refresh.ok) {
-          const { data } = await refresh.json()
-          setEvents(data ?? [])
-        }
+        await refreshEvents()
       }
     } else {
       setFeedback('Evento criado com sucesso!')
-      
-      // Criar banner se houver arquivo
-      if (form.bannerFile && updatedEvent?.id) {
+      if (updatedEvent) {
+        setEvents((prev) => [updatedEvent, ...prev])
+      } else {
+        await refreshEvents()
+      }
+    }
+
+    if (form.bannerFile && eventId) {
+      console.log('🚀 Iniciando upload do banner para evento:', eventId)
         try {
           const fileExt = form.bannerFile.name.split('.').pop() || 'png'
-          const filePath = `${Date.now()}-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}.${fileExt}`
+        const filePath = `${Date.now()}-${
+          crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)
+        }.${fileExt}`
 
-          const { error: uploadError } = await supabase.storage
-            .from(BANNER_BUCKET)
-            .upload(filePath, form.bannerFile, {
+        const { error: uploadError } = await supabase.storage.from(BANNER_BUCKET).upload(filePath, form.bannerFile, {
               cacheControl: '3600',
               upsert: false,
             })
 
-          if (!uploadError) {
+        if (uploadError) throw uploadError
+
             const { data: publicData } = supabase.storage.from(BANNER_BUCKET).getPublicUrl(filePath)
             const imageUrl = publicData?.publicUrl
 
             if (imageUrl) {
-              await fetch('/api/admin/event-banners', {
+          console.log('✅ Upload concluído. Salvando no banco:', { imageUrl, eventId, editingBanner: !!editingBanner })
+          
+          if (editingBanner) {
+            const updateResponse = await fetch('/api/admin/event-banners', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                id: editingBanner.id,
+                image_url: imageUrl,
+                image_path: filePath,
+                is_active: true,
+              }),
+            })
+            
+            console.log('📝 Resposta PUT banner:', await updateResponse.json())
+
+            if (editingBanner.image_path && editingBanner.image_path !== filePath) {
+              await supabase.storage.from(BANNER_BUCKET).remove([editingBanner.image_path])
+            }
+          } else {
+              const createResponse = await fetch('/api/admin/event-banners', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  titulo: null,
-                  subtitulo: null,
-                  event_id: updatedEvent.id,
+                  titulo: form.bannerTitulo || null,
+                  subtitulo: form.bannerSubtitulo || null,
+                event_id: eventId,
                   image_url: imageUrl,
                   image_path: filePath,
                   is_active: true,
                 }),
               })
-              setFeedback('Evento e banner criados com sucesso!')
-            }
+              
+              const createResult = await createResponse.json()
+              console.log('📝 Resposta POST banner:', createResult)
+              
+              if (!createResponse.ok) {
+                throw new Error(createResult.error || 'Erro ao criar banner')
+              }
+          }
+
+          setFeedback((prev) => (prev ? `${prev} Banner atualizado!` : 'Banner atualizado!'))
           }
         } catch (error) {
-          console.error('Erro ao criar banner:', error)
-          setFeedback('Evento criado, mas houve erro ao criar o banner.')
-        }
+        console.error('❌ Erro ao atualizar banner:', error)
+        setFeedback('Evento salvo, mas houve erro ao atualizar o banner.')
       }
-
-      if (updatedEvent) {
-        setEvents((prev) => [updatedEvent, ...prev])
       } else {
-        const refresh = await fetch('/api/admin/events?list=1')
-        if (refresh.ok) {
-          const { data } = await refresh.json()
-          setEvents(data ?? [])
-        }
+      if (form.bannerFile && !eventId) {
+        console.error('❌ Banner não foi enviado: eventId não encontrado')
       }
     }
 
-    setForm(defaultForm)
+    setForm(createDefaultForm())
     setEditingId(null)
+    setEditingBanner(null)
     setLoading(false)
   }
 
@@ -230,11 +404,35 @@ export function EventAdminPanel({ initialEvents }: Props) {
     setFeedback('Evento removido.')
   }
 
-  const handleEdit = (evento: EventRecord) => {
+  const handleEdit = async (evento: EventRecord) => {
     setEditingId(evento.id)
+
+    let banner: EventBannerRecord | null = null
+
+    try {
+      const { data, error } = await supabase
+        .from('event_banners')
+        .select('*')
+        .eq('event_id', evento.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (error) {
+        console.error('Erro ao carregar banner do evento:', error)
+      } else {
+        banner = (data?.[0] as EventBannerRecord | undefined) ?? null
+      }
+    } catch (error) {
+      console.error('Erro inesperado ao buscar banner:', error)
+    }
+
+    setEditingBanner(banner)
+
+    const descricaoSections = parseDescriptionSections(evento.descricao)
+
     setForm({
       titulo: evento.titulo ?? '',
-      descricao: evento.descricao ?? '',
+      descricaoSections,
       data_horario: formatDateForInput(evento.data_horario),
       local_nome: evento.local_nome ?? '',
       local_detalhe: evento.local_detalhe ?? '',
@@ -242,20 +440,26 @@ export function EventAdminPanel({ initialEvents }: Props) {
         typeof evento.preco === 'number' && !Number.isNaN(evento.preco)
           ? String(evento.preco).replace('.', ',')
           : '',
+      capacidade_maxima:
+        typeof evento.capacidade_maxima === 'number' && !Number.isNaN(evento.capacidade_maxima)
+          ? String(evento.capacidade_maxima)
+          : '',
       destaque: Boolean(evento.destaque),
       bannerFile: null,
-      bannerPreview: null,
-      bannerTitulo: '',
-      bannerSubtitulo: '',
+      bannerPreview: banner?.image_url ?? null,
+      bannerTitulo: banner?.titulo ?? '',
+      bannerSubtitulo: banner?.subtitulo ?? '',
     })
-    setFeedback('Editando evento. Banner só pode ser adicionado ao criar um novo evento.')
+
+    setFeedback('Editando evento. Atualize as informações e salve.')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleCancelEdit = () => {
     setEditingId(null)
-    setForm(defaultForm)
+    setForm(createDefaultForm())
     setFeedback(null)
+    setEditingBanner(null)
   }
 
   return (
@@ -309,15 +513,81 @@ export function EventAdminPanel({ initialEvents }: Props) {
             />
           </label>
 
-          <label className="space-y-2 md:col-span-2">
-            <span className="text-xs font-semibold uppercase text-[#bdbdc3]">Descrição</span>
-            <textarea
-              value={form.descricao}
-              onChange={(event) => handleChange('descricao', event.target.value)}
-              rows={3}
-              className="w-full rounded-xl border border-white/10 bg-[#0f0f10] px-4 py-3 text-sm text-[#f5f5f5]"
+          <div className="space-y-3 md:col-span-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className="text-xs font-semibold uppercase text-[#bdbdc3]">
+                  Seções do evento
+                </span>
+                <p className="text-[11px] text-[#9a9aa2]">
+                  Organize o conteúdo em blocos. Cada bloco aparece como um card na página do evento.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddSection}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold uppercase text-[#f5f5f5] transition hover:border-white/20 hover:bg-white/5"
+              >
+                <span>➕</span>
+                <span>Adicionar bloco</span>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {form.descricaoSections.map((section, index) => (
+                <div
+                  key={section.id}
+                  className="space-y-3 rounded-xl border border-white/10 bg-[#0f0f10] p-4 shadow-sm"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-xs font-semibold uppercase text-[#bdbdc3]">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[11px] text-[#f5f5f5]">
+                        {index + 1}
+                      </span>
+                      <span>Bloco do conteúdo</span>
+                    </div>
+                    {form.descricaoSections.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSection(section.id)}
+                        className="text-xs font-semibold uppercase text-[#f87171] transition hover:text-[#fda4af]"
+                      >
+                        Remover
+                      </button>
+                    )}
+                  </div>
+
+                  <label className="space-y-2">
+                    <span className="text-[11px] font-semibold uppercase text-[#9a9aa2]">
+                      Título opcional
+                    </span>
+                    <input
+                      type="text"
+                      value={section.titulo}
+                      onChange={(event) => handleSectionChange(section.id, 'titulo', event.target.value)}
+                      placeholder="Ex: Ingresso Experiência Coffee Music"
+                      className="w-full rounded-lg border border-white/10 bg-[#18181b] px-4 py-3 text-sm text-[#f5f5f5] placeholder:text-[#5f5f66]"
             />
           </label>
+
+                  <label className="space-y-2">
+                    <span className="text-[11px] font-semibold uppercase text-[#9a9aa2]">
+                      Conteúdo
+                    </span>
+                    <textarea
+                      value={section.conteudo}
+                      onChange={(event) =>
+                        handleSectionChange(section.id, 'conteudo', event.target.value)
+                      }
+                      rows={5}
+                      placeholder="Descreva este bloco. Você pode usar listas, emojis e quebras de linha."
+                      className="w-full rounded-lg border border-white/10 bg-[#18181b] px-4 py-3 text-sm text-[#f5f5f5] placeholder:text-[#5f5f66]"
+                    />
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <label className="space-y-2">
             <span className="text-xs font-semibold uppercase text-[#bdbdc3]">Local</span>
@@ -353,6 +623,19 @@ export function EventAdminPanel({ initialEvents }: Props) {
             />
           </label>
 
+          <label className="space-y-2">
+            <span className="text-xs font-semibold uppercase text-[#bdbdc3]">Capacidade máxima</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={form.capacidade_maxima}
+              onChange={(event) => handleChange('capacidade_maxima', event.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#0f0f10] px-4 py-3 text-sm text-[#f5f5f5]"
+              placeholder="Quantidade total de vagas"
+            />
+          </label>
+
           <label className="flex items-center gap-2 md:col-span-2">
             <input
               type="checkbox"
@@ -364,37 +647,81 @@ export function EventAdminPanel({ initialEvents }: Props) {
           </label>
         </div>
 
+          <div className="space-y-4 rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/5 p-6 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🎨</span>
+                <div>
+                  <h4 className="text-base font-bold uppercase tracking-wide text-[#f5f5f5]">
+                    Banner Promocional
+                  </h4>
+                  <p className="mt-0.5 text-xs text-amber-200/90">
+                    {editingId
+                      ? 'Atualize o banner do evento, se necessário'
+                      : 'Recomendado: adicione uma imagem de destaque'}
+                  </p>
+                </div>
+              </div>
         {!editingId && (
-          <div className="space-y-4 rounded-xl border border-blue-500/20 bg-blue-500/5 p-5">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🎨</span>
-              <h4 className="text-sm font-bold uppercase tracking-wide text-[#f5f5f5]">
-                Banner Promocional (Opcional)
-              </h4>
+                <span className="rounded-full bg-amber-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-200">
+                  Recomendado
+                </span>
+              )}
             </div>
-            <p className="text-xs text-blue-200">
-              Adicione um banner visual para destacar este evento
-            </p>
 
+            <div className="space-y-3 rounded-lg border border-white/10 bg-[#0f0f10] p-4">
             <label className="space-y-2">
-              <span className="text-xs font-semibold uppercase text-[#bdbdc3]">Imagem do Banner</span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-[#bdbdc3]">
+                  📤 Selecione a imagem do banner
+                </span>
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
                 onChange={(event) => handleBannerFileChange(event.target.files?.[0] ?? null)}
-                className="block w-full cursor-pointer rounded-xl border border-dashed border-white/20 bg-[#0f0f10] px-4 py-3 text-sm text-[#f5f5f5] file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-[#f5f5f5] file:transition hover:file:bg-white/20"
+                  className="block w-full cursor-pointer rounded-xl border-2 border-dashed border-amber-500/30 bg-[#18181b] px-4 py-4 text-sm text-[#f5f5f5] transition hover:border-amber-500/50 hover:bg-[#1a1a1f] file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-amber-500/20 file:px-4 file:py-2 file:text-xs file:font-bold file:uppercase file:tracking-wide file:text-amber-200 file:transition hover:file:bg-amber-500/30"
               />
-              {form.bannerPreview && (
-                // eslint-disable-next-line @next/next/no-img-element
+                <p className="text-[11px] text-[#9a9aa2]">
+                  ✨ Formato: PNG, JPG ou WebP • Tamanho recomendado: 1200x600px
+                </p>
+              </label>
+
+              {(form.bannerPreview || editingBanner?.image_url) && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-emerald-300">
+                    <span>✅</span>
+                    <span className="font-semibold">Pré-visualização do banner:</span>
+                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={form.bannerPreview}
+                    src={form.bannerPreview ?? editingBanner?.image_url ?? ''}
                   alt="Pré-visualização do banner"
-                  className="mt-3 h-32 w-full rounded-lg object-cover"
+                    className="h-40 w-full rounded-lg border border-emerald-500/30 object-cover shadow-lg"
                 />
+                  {form.bannerFile && (
+                    <button
+                      type="button"
+                      onClick={() => handleBannerFileChange(null)}
+                      className="text-xs font-semibold uppercase text-amber-300 transition hover:text-amber-200"
+                    >
+                      🗑️ Remover banner
+                    </button>
+                  )}
+                </div>
               )}
-            </label>
+
+              {editingId && editingBanner && !form.bannerFile && (
+                <div className="rounded-lg border border-blue-500/20 bg-blue-500/10 p-3 text-xs text-blue-200">
+                  ℹ️ Banner atual em uso. Selecione um novo arquivo acima para substituí-lo.
           </div>
         )}
+
+              {!form.bannerPreview && !editingBanner && !form.bannerFile && (
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-200">
+                  💡 Dica: Eventos com banner se destacam mais na home e na lista de eventos!
+                </div>
+              )}
+            </div>
+          </div>
 
         {feedback && (
           <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${
@@ -456,8 +783,10 @@ export function EventAdminPanel({ initialEvents }: Props) {
                       minute: '2-digit',
                     })}
                   </p>
-                  {evento.descricao && (
-                    <p className="text-xs text-[#73737c] line-clamp-1">{evento.descricao}</p>
+                  {getDescriptionPreview(evento.descricao) && (
+                    <p className="text-xs text-[#73737c] line-clamp-2">
+                      {getDescriptionPreview(evento.descricao)}
+                    </p>
                   )}
                 </div>
                 <div className="flex gap-2">

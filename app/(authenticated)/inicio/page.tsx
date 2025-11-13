@@ -1,6 +1,15 @@
 import Link from 'next/link'
-import { getChallenges, getChallengeProgress, getEvents } from '@/lib/queries'
+import Image from 'next/image'
+import {
+  getActiveEventBanners,
+  getChallenges,
+  getChallengeProgress,
+  getEvents,
+  type EventBannerRecord,
+} from '@/lib/queries'
 import { getSupabaseServer } from '@/lib/supabaseServer'
+import { RitmoPointsPanel } from './RitmoPointsPanel'
+import { ActivityHeatmap } from './ActivityHeatmap'
 
 function formatEventHighlight(date: string | null, title?: string | null, local?: string | null) {
   if (!date) return title ?? 'Evento em breve'
@@ -21,18 +30,21 @@ export default async function InicioPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const [eventos, desafios, progressoUsuario] = await Promise.all([
+  const [eventos, desafios, progressoUsuario, banners] = await Promise.all([
     getEvents(),
     getChallenges(),
     user ? getChallengeProgress(user.id) : Promise.resolve([]),
+    getActiveEventBanners(),
   ])
 
-  const proximoEvento = eventos[0]
-  const desafioSemana = desafios[0]
-  const totalPontos = progressoUsuario.reduce((acc, registro) => acc + (registro.progresso ?? 0), 0)
+  const eventosOrdenados = [...eventos].sort((a, b) =>
+    new Date(a.data_horario).getTime() - new Date(b.data_horario).getTime()
+  )
+  const proximoEvento = eventosOrdenados.find((evento) => new Date(evento.data_horario) >= new Date()) || eventosOrdenados[0]
+  const destaqueBanner: EventBannerRecord | null =
+    proximoEvento?.id ? banners.find((banner) => banner.event_id === proximoEvento.id) ?? null : null
 
-  const destaques = [
-    {
+  const destaque = {
       id: 'next-event',
       titulo: 'Próximo encontro confirmado',
       descricao: proximoEvento
@@ -45,29 +57,8 @@ export default async function InicioPage() {
       acao: 'Ver detalhes',
       href: proximoEvento ? '/eventos' : undefined,
       emphasize: true,
-    },
-    {
-      id: 'pontos',
-      titulo: 'Ritmo Points acumulados',
-      descricao:
-        totalPontos > 0
-          ? `${totalPontos} pontos • Continue no ritmo!`
-          : 'Você ainda não acumulou pontos esta semana.',
-      acao: 'Ver ranking',
-      href: '/desafios',
-      tag: 'Em breve',
-    },
-    {
-      id: 'desafio',
-      titulo: 'Desafio da semana',
-      descricao: desafioSemana
-        ? desafioSemana.descricao ?? 'Entre, marque presença e some pontos.'
-        : 'Novos desafios chegam toda semana.',
-      acao: 'Ver desafios',
-      href: '/desafios',
-      tag: 'Em breve',
-    },
-  ]
+    banner: destaqueBanner,
+  }
 
   return (
     <section className="space-y-6">
@@ -83,89 +74,68 @@ export default async function InicioPage() {
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {destaques.map((card) => (
+      <div className="grid gap-4 md:grid-cols-3">
+        {/* Card destaque do evento */}
           <div
-            key={card.id}
-            className={`flex h-full flex-col rounded-lg border border-white/5 p-5 shadow-lg transition ${
-              card.emphasize
-                ? 'bg-gradient-to-r from-[#f5f5f5] to-[#dcdcdc] text-[#0f0f10]'
-                : 'bg-[#18181b] hover:border-white/30'
+          className={`relative flex h-full flex-col overflow-hidden rounded-lg border border-white/5 shadow-lg transition ${
+            destaque.banner ? 'bg-[#0f0f10]' : 'bg-gradient-to-r from-[#f5f5f5] to-[#dcdcdc]'
+          }`}
+        >
+          {destaque.banner && (
+            <>
+              <Image
+                src={destaque.banner.image_url}
+                alt={destaque.banner.titulo ?? destaque.titulo}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 480px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0f0f10]/85 via-[#0f0f10]/75 to-[#0f0f10]/45" />
+            </>
+          )}
+
+          <div
+            className={`relative z-10 flex h-full flex-col p-5 ${
+              destaque.banner ? 'text-[#f5f5f5]' : 'text-[#0f0f10]'
             }`}
           >
-            <div className="flex items-start justify-between gap-3">
-              <h3
-                className={`text-base font-semibold uppercase tracking-wide ${
-                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
-                }`}
-              >
-                {card.titulo}
-              </h3>
-              {card.tag && (
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
-                    card.emphasize
-                      ? 'bg-[#0f0f10] text-[#f5f5f5]'
-                      : 'border border-white/15 text-[#c9c9d2]'
-                  }`}
-                >
-                  {card.tag}
-                </span>
-              )}
-            </div>
+            <h3 className="text-base font-semibold uppercase tracking-wide">{destaque.titulo}</h3>
             <p
-              className={
-                card.emphasize ? 'mt-2 text-sm text-[#2c240d]' : 'mt-2 text-sm text-[#c9c9d2]'
-              }
+              className={`mt-2 text-sm ${
+                destaque.banner ? 'text-[#e2e2e2]' : 'text-[#2c240d]'
+              }`}
             >
-              {card.descricao}
+              {destaque.descricao}
             </p>
-            {card.href ? (
+            {destaque.href ? (
               <Link
-                href={card.href}
+                href={destaque.href}
                 className={`mt-auto inline-flex text-xs font-semibold uppercase tracking-wider ${
-                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
+                  destaque.banner ? 'text-emerald-200 hover:text-emerald-100' : 'text-[#0f0f10]'
                 }`}
               >
-                {card.acao}
+                {destaque.acao}
               </Link>
             ) : (
               <span
                 className={`mt-auto inline-flex text-xs font-semibold uppercase tracking-wider ${
-                  card.emphasize ? 'text-[#0f0f10]' : 'text-[#f5f5f5]'
+                  destaque.banner ? 'text-[#f5f5f5]' : 'text-[#0f0f10]'
                 }`}
               >
-                {card.acao}
+                {destaque.acao}
               </span>
             )}
           </div>
-        ))}
+        </div>
+
+        {/* Ritmo Points e Desafio */}
+        <div className="md:col-span-2">
+          <RitmoPointsPanel />
+        </div>
       </div>
 
-      <div className="rounded-lg border border-white/5 bg-[#18181b] p-5 shadow-lg md:p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-xs uppercase tracking-[0.3em] text-[#9a9aa2]">Sua constância</span>
-            <h3 className="mt-2 text-lg font-semibold text-[#f5f5f5]">Ritmo das últimas 4 semanas</h3>
-          </div>
-          <span className="rounded-full bg-[#0f0f10] px-3 py-1 text-xs font-semibold text-[#f5f5f5]">
-            3 treinos
-          </span>
-        </div>
-        <div className="mt-6 grid grid-cols-4 gap-3 text-center text-sm text-[#c9c9d2] sm:grid-cols-7">
-          {['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((dia, index) => (
-            <div
-              key={`${dia}-${index}`}
-              className={`flex h-12 flex-col items-center justify-center rounded-lg border border-[#2a2a31] ${
-                index % 3 === 0 ? 'bg-white/10 text-[#f5f5f5]' : ''
-              }`}
-            >
-              <span className="text-xs font-semibold uppercase">{dia}</span>
-              <span className="text-[11px] text-[#9a9aa2]">run</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <ActivityHeatmap />
 
     </section>
   )

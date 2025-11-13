@@ -31,7 +31,7 @@ const destaqueCards: DestaqueCard[] = [
     status: 'ativo',
     ctaLabel: 'Saiba mais',
     ctaType: 'link',
-    href: '/clube/experiencias',
+    href: '/eventos',
   },
   {
     id: 'evento-exclusivo',
@@ -50,24 +50,24 @@ export default async function ClubePage() {
   const proximoEvento = eventos[0]
 
   const cards = destaqueCards.map((card) => {
-    if (card.id === 'evento-exclusivo' && proximoEvento) {
-      return {
-        ...card,
-        descricao: `Próximo encontro: ${proximoEvento.titulo}`,
-      }
-    }
-    return card
+          if (card.id === 'evento-exclusivo' && proximoEvento) {
+            return {
+              ...card,
+              descricao: `Próximo encontro: ${proximoEvento.titulo}`,
+            }
+          }
+          return card
   })
 
   const proximoEventoDesc = proximoEvento
-    ? `Próximo encontro: ${proximoEvento.titulo} • ${new Intl.DateTimeFormat('pt-BR', {
-        day: '2-digit',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-        .format(new Date(proximoEvento.data_horario))
-        .replace('.', '')} • ${proximoEvento.local_nome}`
+            ? `Próximo encontro: ${proximoEvento.titulo} • ${new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+                .format(new Date(proximoEvento.data_horario))
+                .replace('.', '')} • ${proximoEvento.local_nome}`
     : null
 
   return <ClubClient cards={cards} proximoEventoDesc={proximoEventoDesc} />
